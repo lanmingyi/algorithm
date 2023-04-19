@@ -1,0 +1,4 @@
+1.Run the demo：python sort.py --display
+2.创建到数据集的符号链接
+mklink /D  mot_benchmark D:\Download\2DMOT2015
+ln -s /path/to/MOT2015_challenge/data/2DMOT2015 mot_benchmark
