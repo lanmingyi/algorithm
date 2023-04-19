@@ -33,7 +33,7 @@ SORT（Simple Online and Realtime Tracking），在2016年被提出，其性能�
   理解了上面这些组件后，SORT的原理就显得特别简单了。SORT将卡尔曼滤波预测的bbox[prediction]和目标检测算法得到的bbox[measurement]，
 用匈牙利算法进行匹配，再用bbox[prediction]和bbox[measurement]更新当前状态，得到bbox[optimal]，作为追踪的结果。
 匈牙利算法在使用前需要定义损失矩阵，SORT利用bbox[prediction]和bbox[measurement]的IOU（交并比）来定义损失矩阵。
-比如损失矩阵cost[ij]表示前一帧第i个bbox与这一帧第j个bbox的IOU。
+比如损失矩阵cost[ij]表示前一帧第i个bbox与这一帧第j个bbox的IOU。IOU越大，两个bbox越接近，SORT跟踪器便认为两者约有可能是同一物体。
   SORT中的Kalman滤波采用线性匀速模型，状态向量描述成 x = [u, v, s, r, u',v',s']T ，其中u,v表示bbox的中心坐标，s表示面积，
 r表示横纵比（SORT认为对每个目标而言，r是不变的常数；而在Deep SORT中则不是），头上带点的是相应的变化率（速度）。
 ```
