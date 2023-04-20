@@ -41,8 +41,7 @@ class KalmanFilter(object):
 
         # Create Kalman filter model matrices.
         # 因为咱们的运动观测空间是4维还有每个维度的隐含的速度变量
-        # （速度变量可以靠我们自己推算出来，但检测器所能够检测出来的信息只有这4个维度，
-        # 故状态空间8，测量空间4）
+        # （速度变量可以靠我们自己推算出来，但检测器所能够检测出来的信息只有这4个维度，故状态空间8，测量空间4）
         # （x, y, a, h, vx, vy, va, vh），
         # 所以建立一个8*8矩阵的状态空间，每个维度的（ndim+i）代表各自的速度
         self._motion_mat = np.eye(2 * ndim, 2 * ndim)  # self._motion_mat状态转移矩阵。np.eye返回一个二维数组(N,M)，对角线的地方为1，其余的地方为0.
@@ -50,9 +49,8 @@ class KalmanFilter(object):
             self._motion_mat[i, ndim + i] = dt
         self._update_mat = np.eye(ndim, 2 * ndim)  # 状态转换矩阵
 
-        # Motion and observation uncertainty are chosen relative to the current
-        # state estimate. These weights control the amount of uncertainty in
-        # the model. This is a bit hacky.
+        # Motion and observation uncertainty are chosen relative to the current state estimate.
+        # These weights control the amount of uncertainty in the model. This is a bit hacky.
         self._std_weight_position = 1. / 20  # 位置的方差（人为设定）
         self._std_weight_velocity = 1. / 160  # 速度的方差（人为设定）
 
