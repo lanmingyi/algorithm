@@ -1,4 +1,8 @@
 ## ide
 .idea
+*.npy
 
 # output/
+
+# Folders
+__pycache__/
