@@ -45,7 +45,7 @@ def iou_batch(bb_test, bb_gt):
     wh = w * h
     o = wh / ((bb_test[..., 2] - bb_test[..., 0]) * (bb_test[..., 3] - bb_test[..., 1])
               + (bb_gt[..., 2] - bb_gt[..., 0]) * (bb_gt[..., 3] - bb_gt[..., 1]) - wh)
-    return (o)
+    return o
 
 
 def convert_bbox_to_z(bbox):
@@ -70,7 +70,7 @@ def convert_x_to_bbox(x, score=None):
     """
     w = np.sqrt(x[2] * x[3])
     h = x[2] / w
-    if (score == None):
+    if score == None:
         return np.array([x[0] - w / 2., x[1] - h / 2., x[0] + w / 2., x[1] + h / 2.]).reshape((1, 4))
     else:
         return np.array([x[0] - w / 2., x[1] - h / 2., x[0] + w / 2., x[1] + h / 2., score]).reshape((1, 5))
@@ -268,9 +268,9 @@ class Sort(object):
                 ret.append(np.concatenate((d, [trk.id + 1])).reshape(1, -1))  # +1 as MOT benchmark requires positive
             i -= 1
             # remove dead tracklet  删除死掉的跟踪序列
-            if (trk.time_since_update > self.max_age):
+            if trk.time_since_update > self.max_age:
                 self.trackers.pop(i)  # 离开画面/跟踪失败的物体从物体的卡尔曼跟踪器跟踪列表中删除
-        if (len(ret) > 0):
+        if len(ret) > 0:
             return np.concatenate(ret)
         return np.empty((0, 5))  # 返回当前画面中所有被跟踪物体的BBox与ID二维矩阵[[x1,y1,x2,y2,id1]...[...]]，在main函数
 
@@ -325,8 +325,8 @@ if __name__ == '__main__':
         seq_dets = np.loadtxt(seq_dets_fn, delimiter=',')  # load detections
         seq = seq_dets_fn[pattern.find('*'):].split(os.path.sep)[0]
 
-        with open(os.path.join('output', '%s.txt' % (seq)), 'w') as out_file:
-            print("Processing %s." % (seq))
+        with open(os.path.join('output', '%s.txt' % seq), 'w') as out_file:
+            print("Processing %s." % seq)
             # seq_dets第1列最大的值决定了本数据集的总帧数，循环逐帧处理
             for frame in range(int(seq_dets[:, 0].max())):
                 frame += 1  # detection and frame numbers begin at 1
@@ -334,7 +334,7 @@ if __name__ == '__main__':
                 dets[:, 2:4] += dets[:, 0:2]  # convert to [x1,y1,w,h] to [x1,y1,x2,y2]
                 total_frames += 1
 
-                if (display):  # 如果要显示跟踪结果，那么先将数据集中当前帧的jpg文件显示到屏幕上
+                if display:  # 如果要显示跟踪结果，那么先将数据集中当前帧的jpg文件显示到屏幕上
                     fn = os.path.join('mot_benchmark', phase, seq, 'img1', '%06d.jpg' % frame)
                     im = io.imread(fn)  # skimage.io.imread 从文件加载图像
                     ax1.imshow(im)
