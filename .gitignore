@@ -6,3 +6,7 @@
 
 # Folders
 __pycache__/
+
+# Files
+*.t7
+*.weights
