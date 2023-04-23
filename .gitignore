@@ -13,4 +13,5 @@ __pycache__/
 *.dll
 *.caffemodel
 *.rar
+*.zip
 *.mp4
