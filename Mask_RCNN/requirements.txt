@@ -1,0 +1,22 @@
+numpy
+scipy
+Pillow
+cython
+matplotlib
+scikit-image==0.16.2
+tensorflow-gpu
+# tensorflow==1.8
+keras
+opencv-python
+h5py
+imgaug
+IPython[all]
+
+#tensorflow==1.6.0
+#keras== 2.2.0
+
+# 必须具有Visual C ++ 2015生成工具
+# pip install git+https://github.com/philferriere/cocoapi.git#subdirectory=PythonAPI
+# python setup.py build_ext install
+# For Python, run "make" under coco/PythonAPI
+

@@ -10,6 +10,7 @@ __pycache__/
 # Files
 *.t7
 *.weights
+*.h5
 *.dll
 *.caffemodel
 *.rar
