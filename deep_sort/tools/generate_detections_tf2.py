@@ -211,11 +211,11 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Re-ID feature extractor")
     parser.add_argument(
         "--model",
-        default="resources/networks/mars-small128.pb",
+        default="../resources/networks/mars-small128.pb",
         help="Path to freezed inference graph protobuf.")
     parser.add_argument(
         "--mot_dir", help="Path to MOTChallenge directory (train or test)",
-        required=True)
+        )  # required=True
     parser.add_argument(
         "--detection_dir", help="Path to custom detections. Defaults to "
         "standard MOT detections Directory structure should be the default "
