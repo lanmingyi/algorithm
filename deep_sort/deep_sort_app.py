@@ -229,12 +229,13 @@ def parse_args():
     """ Parse command line arguments.
     """
     parser = argparse.ArgumentParser(description="Deep SORT")
+    # required=True
     parser.add_argument(
         "--sequence_dir", help="Path to MOTChallenge sequence directory",
-        default=None, required=True)
+        default='D://BrightComplete/DataSet/MOT16/test/MOT16-06', )
     parser.add_argument(
-        "--detection_file", help="Path to custom detections.", default=None,
-        required=True)
+        "--detection_file", help="Path to custom detections.", default="./resources/detections/MOT16_POI_test/MOT16-06.npy",
+        )
     parser.add_argument(
         "--output_file", help="Path to the tracking output file. This file will"
                               " contain the tracking results on completion.",
@@ -255,7 +256,7 @@ def parse_args():
                                       "metric (object appearance).", type=float, default=0.2)
     parser.add_argument(
         "--nn_budget", help="Maximum size of the appearance descriptors "
-                            "gallery. If None, no budget is enforced.", type=int, default=None)
+                            "gallery. If None, no budget is enforced.", type=int, default=100)
     parser.add_argument(
         "--display", help="Show intermediate tracking results",
         default=True, type=bool_string)
