@@ -15,7 +15,7 @@ try:
         if platform == "win32":
             # Change these variables to point to the correct folder (Release/x64 etc.)
             sys.path.append(dir_path + '/openpose');
-            os.environ['PATH']  = os.environ['PATH'] + ';' + dir_path + '/openpose/bin;'
+            os.environ['PATH'] = os.environ['PATH'] + ';' + dir_path + '/openpose/bin;'
             import pyopenpose as op
         else:
             # Change these variables to point to the correct folder (Release/x64 etc.)
@@ -24,13 +24,15 @@ try:
             # sys.path.append('/usr/local/python')
             from openpose import pyopenpose as op
     except ImportError as e:
-        print('Error: OpenPose library could not be found. Did you enable `BUILD_PYTHON` in CMake and have this Python script in the right folder?')
+        print(
+            'Error: OpenPose library could not be found. Did you enable `BUILD_PYTHON` in CMake and have this Python script in the right folder?')
         raise e
 
     # Flags
     parser = argparse.ArgumentParser()
-    parser.add_argument("--image_path", default="data/COCO_val2014_000000000338.jpg", help="Process an image. Read all standard formats (jpg, png, bmp, etc.).")
-    parser.add_argument("--vodeo_path", default="rtsp://admin:admin123@192.168.1.2:554/h264/ch1/main/av_stream",
+    parser.add_argument("--image_path", default="data/COCO_val2014_000000000338.jpg",
+                        help="Process an image. Read all standard formats (jpg, png, bmp, etc.).")
+    parser.add_argument("--video_path", default="rtsp://admin:admin123@192.168.1.2:554/h264/ch1/main/av_stream",
                         help="Process an image. Read all standard formats (jpg, png, bmp, etc.).")
     args = parser.parse_known_args()
 
@@ -41,13 +43,15 @@ try:
     # Add others in path?
     for i in range(0, len(args[1])):
         curr_item = args[1][i]
-        if i != len(args[1])-1: next_item = args[1][i+1]
-        else: next_item = "1"
+        if i != len(args[1]) - 1:
+            next_item = args[1][i + 1]
+        else:
+            next_item = "1"
         if "--" in curr_item and "--" in next_item:
-            key = curr_item.replace('-','')
+            key = curr_item.replace('-', '')
             if key not in params:  params[key] = "1"
         elif "--" in curr_item and "--" not in next_item:
-            key = curr_item.replace('-','')
+            key = curr_item.replace('-', '')
             if key not in params: params[key] = next_item
 
     # Construct it from system arguments
@@ -62,7 +66,7 @@ try:
     # Process Image
     datum = op.Datum()
     imageToProcess = cv2.imread(args[0].image_path)
-    # cap = cv2.VideoCapture(args[0].vodeo_path)
+    # cap = cv2.VideoCapture(args[0].video_path)
     # ret, imageToProcess = cap.read()
     # print(imageToProcess)
     datum.cvInputData = imageToProcess
@@ -95,6 +99,3 @@ try:
 except Exception as e:
     print(e)
     sys.exit(-1)
-
-
-
