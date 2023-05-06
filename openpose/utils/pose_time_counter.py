@@ -9,7 +9,7 @@ import datetime
 from . import processing
 
 
-class PoseTime():
+class PoseTime:
     def __init__(self, touch_zones, fps, trust_frames=10):
         self.start_work_time = None  # record starting working time
         self.end_work_time = None
@@ -118,7 +118,8 @@ class PoseTime():
             self.polygons_frames[poly_id_three] = 0
 
         # working 时重置
-        if self.start_work is True: self.polygons_frames = {}
+        if self.start_work is True:
+            self.polygons_frames = {}
 
         return polygons_count
 
@@ -184,6 +185,13 @@ class PoseTime():
         diff_time = (now_time - start_time).seconds
         return diff_time
 
+    # list[start:end:step] 起始位置、结束位置、步长
+    """
+    射线法就是以判断点开始，向右（或向左）的水平方向作一射线，计算该射线与多边形每条边的交点个数，如果交点个数为奇数，则点位于多边形内，偶数则在多边形外。该算法对于复合多边形也能正确判断。
+    射线法的关键是正确计算射线与每条边是否相交。并且规定线段与射线重叠或者射线经过线段下端点属于不相交。首先排除掉不相交的情况
+    函数里求交的部分就是利用两个三角形的比例关系求出交点在起点的左边还是右边
+    """
+
     @staticmethod
     def is_in_zone(center, poly):
         poly_x = poly[::2]
@@ -194,9 +202,9 @@ class PoseTime():
         j = l - 1
         while i < l - 1:
             i += 1
-            # print(i, [poly_x[i], poly_y[i]], j, [poly_x[j], poly_y[j]])
             if (poly_x[i] <= center[0] < poly_x[j]) or (poly_x[j] <= center[0] < poly_x[i]):
-                if (center[1] < (poly_y[j] - poly_y[i]) * (center[0] - poly_x[i]) / (poly_x[j] - poly_x[i]) + poly_y[i]):
+                # 相似三角形
+                if center[1] < (poly_y[j] - poly_y[i]) * (center[0] - poly_x[i]) / (poly_x[j] - poly_x[i]) + poly_y[i]:
                     res = not res
             j = i
         return res
@@ -211,9 +219,8 @@ class PoseTime():
                 # print(zone_flags)
                 for i in range(len(self.touch_zones)):
                     # zone_flags里存True和False
-                    zone_flags[i] = self.is_in_zone(
-                        left_hand_point, self.touch_zones[i]
-                    ) or self.is_in_zone(right_hand_point, self.touch_zones[i])
+                    zone_flags[i] = self.is_in_zone(left_hand_point, self.touch_zones[i]) \
+                                    or self.is_in_zone(right_hand_point, self.touch_zones[i])
                 # print(111111111111111111111111111111111)
                 # print(type(zone_flags))
                 # print(zone_flags)
@@ -244,7 +251,7 @@ class PoseTime():
                     print('start_touch_time', start_touch_time)
 
                     end_touch_time = datetime.datetime.strptime(self.end_touch_time, "%H:%M:%S")
-                    print('end_touch_time',end_touch_time)
+                    print('end_touch_time', end_touch_time)
                     # print(22222222222222)
                     # print(end_touch_time)
                     if end_touch_time > start_touch_time:
@@ -254,4 +261,4 @@ class PoseTime():
 
                 self.touchshowdic[id] = touch_show_label
 
-        return self.start_work, self.end_work,  self.diff_time_secs  # , self.touchshowdic
+        return self.start_work, self.end_work, self.diff_time_secs  # , self.touchshowdic

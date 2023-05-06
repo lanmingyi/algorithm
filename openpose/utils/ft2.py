@@ -109,7 +109,7 @@ if __name__ == "__main__":
     line = "测试:{}".format(id_num)
     img = np.zeros([300, 300, 3])
 
-    color_ = (0, 0, 255)  # Green
+    color_ = (0, 0, 255)  # Red
     pos = (3, 3)
     text_size = 24
 
