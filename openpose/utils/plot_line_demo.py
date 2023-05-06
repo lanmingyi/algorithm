@@ -42,13 +42,14 @@
 import cv2
 import time
 import numpy as np
+
 tpPointsChoose = []
 drawing = False
 tempFlag = False
 
 
 def draw_ROI(event, x, y, flags, param):
-    global point1, tpPointsChoose,pts,drawing, tempFlag
+    global point1, tpPointsChoose, pts, drawing, tempFlag
     if event == cv2.EVENT_LBUTTONDOWN:
         tempFlag = True
         drawing = False
@@ -74,20 +75,20 @@ cv2.setMouseCallback('video', draw_ROI)
 cap = cv2.VideoCapture("../data/test1.mp4")
 
 fps = cap.get(cv2.CAP_PROP_FPS)
-size = (cap.get(cv2.CAP_PROP_FRAME_WIDTH),cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-print("fps: {}\nsize: {}".format(fps,size))
-vfps = 0.7/fps  # 延迟播放用，根据运算能力调整
-while (True):
+size = (cap.get(cv2.CAP_PROP_FRAME_WIDTH), cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+print("fps: {}\nsize: {}".format(fps, size))
+vfps = 0.7 / fps  # 延迟播放用，根据运算能力调整
+while True:
     # capture frame-by-frame
     ret, frame = cap.read()
     # display the resulting frame
-    if (tempFlag == True and drawing == False) :  # 鼠标点击
+    if tempFlag is True and drawing is False:  # 鼠标点击
         cv2.circle(frame, point1, 5, (0, 255, 0), 2)
         for i in range(len(tpPointsChoose) - 1):
             cv2.line(frame, tpPointsChoose[i], tpPointsChoose[i + 1], (255, 0, 0), 2)
-    if (tempFlag == True and drawing == True):  #鼠标右击
+    if tempFlag == True and drawing is True:  # 鼠标右击
         cv2.polylines(frame, [pts], True, (0, 0, 255), thickness=2)
-    if (tempFlag == False and drawing == True):  # 鼠标中键
+    if tempFlag is False and drawing is True:  # 鼠标中键
         for i in range(len(tpPointsChoose) - 1):
             cv2.line(frame, tpPointsChoose[i], tpPointsChoose[i + 1], (0, 0, 255), 2)
     time.sleep(vfps)
