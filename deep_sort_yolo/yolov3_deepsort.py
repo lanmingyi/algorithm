@@ -12,6 +12,7 @@ from utils.parser import get_config
 from utils.log import get_logger
 from utils.io import write_results
 from utils.counter import counting
+
 import os
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
 
@@ -169,8 +170,8 @@ def parse_args():
     parser = argparse.ArgumentParser()
     # parser.add_argument("VIDEO_PATH", type=str)
     parser.add_argument("--VIDEO_PATH", type=str, default="/dev/video0")
-    parser.add_argument("--config_detection", type=str, default="./configs/yolov3.yaml")
-    parser.add_argument("--config_deepsort", type=str, default="./configs/deep_sort.yaml")
+    parser.add_argument("--config_detection", type=str, default="../config/yolov3.yaml")
+    parser.add_argument("--config_deepsort", type=str, default="../config/deep_sort.yaml")
     # parser.add_argument("--ignore_display", dest="display", action="store_false", default=True)
     # parser.add_argument("--display", action="store_true")
     parser.add_argument("--display", action="store_true", default="--display")
