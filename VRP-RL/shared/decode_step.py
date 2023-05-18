@@ -1,12 +1,12 @@
 import tensorflow as tf
-import tensorflow.compat.v1 as tf
-tf.disable_v2_behavior()
+# import tensorflow.compat.v1 as tf
+# tf.disable_v2_behavior()
 
 
 class DecodeStep(object):
-    '''
+    """
     Base class of the decoding (without RNN)
-    '''
+    """
 
     def __init__(self,
                  ClAttention,
@@ -17,7 +17,7 @@ class DecodeStep(object):
                  mask_glimpses=True,
                  mask_pointer=True,
                  _scope=''):
-        '''
+        """
         This class does one-step of decoding.
         Inputs:
             ClAttention:    the class which is used for attention
@@ -28,7 +28,7 @@ class DecodeStep(object):
             mask_glimpses:  whether to use masking for the glimpses or not
             mask_pointer:   whether to use masking for the glimpses or not
             _scope:         variable scope
-        '''
+        """
 
         self.hidden_dim = hidden_dim
         self.use_tanh = use_tanh
@@ -97,13 +97,7 @@ class DecodeStep(object):
 
         return logit, None
 
-    def step(self,
-             decoder_inp,
-             context,
-             Env,
-             decoder_state=None,
-             *args,
-             **kwargs):
+    def step(self, decoder_inp, context, Env, decoder_state=None, *args, **kwargs):
         """
         get logits and probs at a given decoding step.
         Inputs:
@@ -177,21 +171,18 @@ class RNNDecodeStep(DecodeStep):
         #         self.dropout = tf.placeholder(tf.float32,name='decoder_rnn_dropout')
 
         # build a multilayer LSTM cell
-        single_cell = tf.nn.rnn_cell.BasicLSTMCell(hidden_dim,forget_bias=forget_bias)
         # single_cell = tf.contrib.rnn.BasicLSTMCell(hidden_dim,forget_bias=forget_bias)
-        self.dropout = tf.placeholder(tf.float32, name='decoder_rnn_dropout')
+        # single_cell = tf.nn.rnn_cell.BasicLSTMCell(hidden_dim, forget_bias=forget_bias)
+        single_cell = tf.keras.layers.LSTMCell(hidden_dim, dropout=forget_bias)
+        # self.dropout = tf.placeholder(tf.float32, name='decoder_rnn_dropout')
+        self.dropout = tf.keras.Input(tf.float32, name='decoder_rnn_dropout')
         # single_cell = tf.contrib.rnn.DropoutWrapper(cell=single_cell, input_keep_prob=(1.0 - self.dropout))
-        single_cell = tf.nn.rnn_cell.DropoutWrapper(cell=single_cell, input_keep_prob=(1.0 - self.dropout))
-        self.cell = tf.nn.rnn_cell.MultiRNNCell([single_cell] * rnn_layers)
+        # single_cell = tf.nn.rnn_cell.DropoutWrapper(cell=single_cell, input_keep_prob=(1.0 - self.dropout))
+        single_cell = tf.nn.RNNCellDropoutWrapper(cell=single_cell, input_keep_prob=(1.0 - self.dropout))
         # self.cell = tf.contrib.rnn.MultiRNNCell([single_cell] * rnn_layers)
+        self.cell = tf.compat.v1.nn.rnn_cell.MultiRNNCell([single_cell] * rnn_layers)
 
-    def get_logit_op(self,
-                     decoder_inp,
-                     context,
-                     Env,
-                     decoder_state,
-                     *args,
-                     **kwargs):
+    def get_logit_op(self, decoder_inp, context, Env, decoder_state, *args, **kwargs):
         """
         For a given input to decoder, returns the logit op and new decoder_state.
         Input:
@@ -213,11 +204,9 @@ class RNNDecodeStep(DecodeStep):
             decoder_state: the update decoder state.
         """
 
-        #         decoder_inp = tf.reshape(decoder_inp,[-1,1,self.hidden_dim])
-        _, decoder_state = tf.nn.dynamic_rnn(self.cell,
-                                             decoder_inp,
-                                             initial_state=decoder_state,
-                                             scope=self._scope + 'Decoder/LSTM/rnn')
+        # decoder_inp = tf.reshape(decoder_inp,[-1,1,self.hidden_dim])
+        # _, decoder_state = tf.nn.dynamic_rnn(self.cell, decoder_inp, initial_state=decoder_state,  scope=self._scope + 'Decoder/LSTM/rnn')
+        _, decoder_state = tf.compat.v1.nn.dynamic_rnn(self.cell, decoder_inp, initial_state=decoder_state,  scope=self._scope + 'Decoder/LSTM/rnn')
         hy = decoder_state[-1].h
 
         # glimpses
