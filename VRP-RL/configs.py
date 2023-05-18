@@ -99,7 +99,7 @@ def ParseParams():
 
     # create a print handler
     out_file = open(os.path.join(args['log_dir'], 'results.txt'), 'w+')
-    prt = utils.printOut(out_file, args['stdout_print'])
+    prt = utils.PrintOut(out_file, args['stdout_print'])
 
     os.environ["CUDA_VISIBLE_DEVICES"] = args['gpu']
 
