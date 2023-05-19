@@ -353,8 +353,7 @@ class RLAgent(object):
         self.prt.print_out('\nValidation overall avg_reward: {}'.format(np.mean(avg_reward)))
         self.prt.print_out('Validation overall reward std: {}'.format(np.sqrt(np.var(avg_reward))))
 
-        self.prt.print_out("Finished evaluation with %d steps in %s." % (step \
-                                                                             , time.strftime("%H:%M:%S",
+        self.prt.print_out("Finished evaluation with %d steps in %s." % (step , time.strftime("%H:%M:%S",
                                                                                              time.gmtime(end_time))))
 
     def evaluate_batch(self, eval_type='greedy'):
@@ -375,10 +374,9 @@ class RLAgent(object):
         R = np.amin(R, 1, keepdims=False)
 
         end_time = time.time() - start_time
-        self.prt.print_out('Average of {} in batch-mode: {} -- std {} -- time {} s'.format(eval_type, \
-                                                                                           np.mean(R),
-                                                                                           np.sqrt(np.var(R)),
-                                                                                           end_time))
+        self.prt.print_out(
+            'Average of {} in batch-mode: {} -- std {} -- time {} s'.format(eval_type, np.mean(R), np.sqrt(np.var(R)),
+                                                                            end_time))
 
     def inference(self, infer_type='batch'):
         if infer_type == 'batch':
