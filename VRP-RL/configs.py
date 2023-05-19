@@ -82,13 +82,12 @@ def ParseParams():
 
     args, unknown = parser.parse_known_args()
     args = vars(args)
-
-    # print('args', args)
+    # args, Namespace(task='vrp10', batch_size=128, n_train=260000, test_size=1000, agent_type='attention', forget_bias=1.0, embedding_dim=128, hidden_dim=128, n_process_blocks=3, rnn_layers=1, decode_len=None, n_glimpses=0, tanh_exploration=10.0, use_tanh=False, mask_glimpses=True, mask_pointer=True, dropout=0.1, is_train=True, actor_net_lr=0.0001, critic_net_lr=0.0001, random_seed=24601, max_grad_norm=2.0, entropy_coeff=0.0, infer_type='batch', beam_width=10, stdout_print=True, gpu='3', log_interval=200, test_interval=200, save_interval=10000, log_dir='logs', data_dir='data', model_dir='', load_path='', disable_tqdm=True)
+    # vars(args), {'task': 'vrp10', 'batch_size': 128, 'n_train': 260000, 'test_size': 1000, 'agent_type': 'attention', 'forget_bias': 1.0, 'embedding_dim': 128, 'hidden_dim': 128, 'n_process_blocks': 3, 'rnn_layers': 1, 'decode_len': None, 'n_glimpses': 0, 'tanh_exploration': 10.0, 'use_tanh': False, 'mask_glimpses': True, 'mask_pointer': True, 'dropout': 0.1, 'is_train': True, 'actor_net_lr': 0.0001, 'critic_net_lr': 0.0001, 'random_seed': 24601, 'max_grad_norm': 2.0, 'entropy_coeff': 0.0, 'infer_type': 'batch', 'beam_width': 10, 'stdout_print': True, 'gpu': '3', 'log_interval': 200, 'test_interval': 200, 'save_interval': 10000, 'log_dir': 'logs', 'data_dir': 'data', 'model_dir': '', 'load_path': '', 'disable_tqdm': True}
 
     args['log_dir'] = "{}/{}-{}".format(args['log_dir'], args['task'], utils.get_time())
     if args['model_dir'] == '':
         args['model_dir'] = os.path.join(args['log_dir'], 'model')
-        # args['model_dir'] = './logs'
 
     # file to write the stdout
     try:
@@ -99,14 +98,15 @@ def ParseParams():
 
     # create a print handler
     out_file = open(os.path.join(args['log_dir'], 'results.txt'), 'w+')
-    prt = utils.PrintOut(out_file, args['stdout_print'])
+    prt = utils.printOut(out_file, args['stdout_print'])
 
     os.environ["CUDA_VISIBLE_DEVICES"] = args['gpu']
 
     args = initialize_task_settings(args, args['task'])
 
-    # print the run args
-    for key, value in sorted(args.items()):
-        prt.print_out("{}: {}".format(key, value))
+    # # print the run args
+    # print('####################config####################')
+    # for key, value in sorted(args.items()):
+    #     prt.print_out("{}: {}".format(key, value))
 
     return args, prt

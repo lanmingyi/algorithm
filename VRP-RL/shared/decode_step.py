@@ -1,12 +1,11 @@
 import tensorflow as tf
-# import tensorflow.compat.v1 as tf
-# tf.disable_v2_behavior()
+import tensorflow.compat.v1 as tf1
 
 
 class DecodeStep(object):
-    """
+    '''
     Base class of the decoding (without RNN)
-    """
+    '''
 
     def __init__(self,
                  ClAttention,
@@ -17,7 +16,7 @@ class DecodeStep(object):
                  mask_glimpses=True,
                  mask_pointer=True,
                  _scope=''):
-        """
+        '''
         This class does one-step of decoding.
         Inputs:
             ClAttention:    the class which is used for attention
@@ -28,7 +27,7 @@ class DecodeStep(object):
             mask_glimpses:  whether to use masking for the glimpses or not
             mask_pointer:   whether to use masking for the glimpses or not
             _scope:         variable scope
-        """
+        '''
 
         self.hidden_dim = hidden_dim
         self.use_tanh = use_tanh
@@ -39,7 +38,7 @@ class DecodeStep(object):
         self._scope = _scope
         self.BIGNUMBER = 100000.
 
-        # create glimpse and attention instances as well as tf.variables.
+        # create glimpse and attention instances as well as tf1.variables.
         # create a list of class instances
         self.glimpses = [None for _ in range(self.n_glimpses)]
         for i in range(self.n_glimpses):
@@ -85,10 +84,10 @@ class DecodeStep(object):
             if self.mask_glimpses:
                 logit -= self.BIGNUMBER * Env.mask
             # prob: [batch_size x max_time
-            prob = tf.nn.softmax(logit)
+            prob = tf1.nn.softmax(logit)
             # decoder_inp : [batch_size x 1 x max_time ] * [batch_size x max_time x hidden_dim] -> 
             # [batch_size x hidden_dim ]
-            decoder_inp = tf.squeeze(tf.matmul(tf.expand_dims(prob, 1), ref), 1)
+            decoder_inp = tf1.squeeze(tf1.matmul(tf1.expand_dims(prob, 1), ref), 1)
 
         # attention
         _, logit = self.pointer(decoder_inp, context, Env)
@@ -97,21 +96,27 @@ class DecodeStep(object):
 
         return logit, None
 
-    def step(self, decoder_inp, context, Env, decoder_state=None, *args, **kwargs):
-        """
+    def step(self,
+             decoder_inp,
+             context,
+             Env,
+             decoder_state=None,
+             *args,
+             **kwargs):
+        '''
         get logits and probs at a given decoding step.
         Inputs:
             decoder_input: Input of the decoding step with shape [batch_size x embedding_dim]
             context: context vector to use in attention
             Env: an instance of the environment
-            decoder_state: The state of the LSTM cell. It can be None when we use a decoder without
+            decoder_state: The state of the LSTM cell. It can be None when we use a decoder without 
                 LSTM cell.
         Returns:
             logit: logits with shape [batch_size x max_time]
             prob: probabilities for the next location visit with shape of [batch_size x max_time]
             logprob: log of probabilities
             decoder_state: updated state of the LSTM cell
-        """
+        '''
 
         logit, decoder_state = self.get_logit_op(
             decoder_inp,
@@ -119,30 +124,21 @@ class DecodeStep(object):
             Env,
             decoder_state)
 
-        logprob = tf.nn.log_softmax(logit)
-        prob = tf.exp(logprob)
+        logprob = tf1.nn.log_softmax(logit)
+        prob = tf1.exp(logprob)
 
         return logit, prob, logprob, decoder_state
 
 
 class RNNDecodeStep(DecodeStep):
-    """
+    '''
     Decodes the sequence. It keeps the decoding history in a RNN.
-    """
+    '''
 
-    def __init__(self,
-                 ClAttention,
-                 hidden_dim,
-                 use_tanh=False,
-                 tanh_exploration=10.,
-                 n_glimpses=0,
-                 mask_glimpses=True,
-                 mask_pointer=True,
-                 forget_bias=1.0,
-                 rnn_layers=1,
-                 _scope=''):
+    def __init__(self, ClAttention, hidden_dim, use_tanh=False, tanh_exploration=10., n_glimpses=0, mask_glimpses=True,
+                 mask_pointer=True, forget_bias=1.0, rnn_layers=1, _scope=''):
 
-        """
+        '''
         This class does one-step of decoding which uses RNN for storing the sequence info.
         Inputs:
             ClAttention:    the class which is used for attention
@@ -156,7 +152,7 @@ class RNNDecodeStep(DecodeStep):
             rnn_layers:     number of LSTM layers
             _scope:         variable scope
 
-        """
+        '''
 
         super(RNNDecodeStep, self).__init__(ClAttention,
                                             hidden_dim,
@@ -168,21 +164,22 @@ class RNNDecodeStep(DecodeStep):
                                             _scope=_scope)
         self.forget_bias = forget_bias
         self.rnn_layers = rnn_layers
-        #         self.dropout = tf.placeholder(tf.float32,name='decoder_rnn_dropout')
+        #         self.dropout = tf1.placeholder(tf1.float32,name='decoder_rnn_dropout')
 
         # build a multilayer LSTM cell
-        # single_cell = tf.contrib.rnn.BasicLSTMCell(hidden_dim,forget_bias=forget_bias)
-        # single_cell = tf.nn.rnn_cell.BasicLSTMCell(hidden_dim, forget_bias=forget_bias)
-        single_cell = tf.keras.layers.LSTMCell(hidden_dim, dropout=forget_bias)
-        # self.dropout = tf.placeholder(tf.float32, name='decoder_rnn_dropout')
-        self.dropout = tf.keras.Input(tf.float32, name='decoder_rnn_dropout')
-        # single_cell = tf.contrib.rnn.DropoutWrapper(cell=single_cell, input_keep_prob=(1.0 - self.dropout))
-        # single_cell = tf.nn.rnn_cell.DropoutWrapper(cell=single_cell, input_keep_prob=(1.0 - self.dropout))
-        single_cell = tf.nn.RNNCellDropoutWrapper(cell=single_cell, input_keep_prob=(1.0 - self.dropout))
-        # self.cell = tf.contrib.rnn.MultiRNNCell([single_cell] * rnn_layers)
-        self.cell = tf.compat.v1.nn.rnn_cell.MultiRNNCell([single_cell] * rnn_layers)
+        single_cell = tf1.nn.rnn_cell.BasicLSTMCell(hidden_dim, forget_bias=forget_bias)
+        self.dropout = tf1.placeholder(tf1.float32, name='decoder_rnn_dropout')
+        # single_cell = tf1.contrib.rnn.DropoutWrapper( cell=single_cell, input_keep_prob=(1.0 - self.dropout))
+        single_cell = tf1.nn.rnn_cell.DropoutWrapper(cell=single_cell, input_keep_prob=(1.0 - self.dropout))
+        self.cell = tf1.nn.rnn_cell.MultiRNNCell([single_cell] * rnn_layers)
 
-    def get_logit_op(self, decoder_inp, context, Env, decoder_state, *args, **kwargs):
+    def get_logit_op(self,
+                     decoder_inp,
+                     context,
+                     Env,
+                     decoder_state,
+                     *args,
+                     **kwargs):
         """
         For a given input to decoder, returns the logit op and new decoder_state.
         Input:
@@ -204,9 +201,11 @@ class RNNDecodeStep(DecodeStep):
             decoder_state: the update decoder state.
         """
 
-        # decoder_inp = tf.reshape(decoder_inp,[-1,1,self.hidden_dim])
-        # _, decoder_state = tf.nn.dynamic_rnn(self.cell, decoder_inp, initial_state=decoder_state,  scope=self._scope + 'Decoder/LSTM/rnn')
-        _, decoder_state = tf.compat.v1.nn.dynamic_rnn(self.cell, decoder_inp, initial_state=decoder_state,  scope=self._scope + 'Decoder/LSTM/rnn')
+        #         decoder_inp = tf1.reshape(decoder_inp,[-1,1,self.hidden_dim])
+        _, decoder_state = tf1.nn.dynamic_rnn(self.cell,
+                                              decoder_inp,
+                                              initial_state=decoder_state,
+                                              scope=self._scope + 'Decoder/LSTM/rnn')
         hy = decoder_state[-1].h
 
         # glimpses
@@ -215,11 +214,11 @@ class RNNDecodeStep(DecodeStep):
             ref, logit = self.glimpses[i](hy, context, Env)
             if self.mask_glimpses:
                 logit -= self.BIGNUMBER * Env.mask
-            prob = tf.nn.softmax(logit)
+            prob = tf1.nn.softmax(logit)
 
             # hy : [batch_size x 1 x max_time ] * [batch_size x max_time x hidden_dim] -> 
             # [batch_size x hidden_dim ]
-            hy = tf.squeeze(tf.matmul(tf.expand_dims(prob, 1), ref), 1)
+            hy = tf1.squeeze(tf1.matmul(tf1.expand_dims(prob, 1), ref), 1)
 
         # attention
         _, logit = self.pointer(hy, context, Env)
