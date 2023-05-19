@@ -82,5 +82,3 @@ vrp100 = TaskVRP(task_name='vrp',
                  capacity=50,
                  demand_max=9)
 task_lst['vrp100'] = vrp100
-
-print('task_lst', task_lst)

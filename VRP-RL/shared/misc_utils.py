@@ -21,7 +21,7 @@ except ImportError:
 print_grad = True
 
 
-class PrintOut(object):
+class printOut(object):
     def __init__(self, f=None, stdout_print=True):
         """
         This class is used for controlling the printing. It will write in a
@@ -50,8 +50,7 @@ class PrintOut(object):
 
     def print_time(self, s, start_time):
         """Take a start time, print elapsed duration, and return a new time."""
-        # self.print_out("%s, time %ds, %s." % (s, (time.time() - start_time) + "  " + str(time.ctime())))
-        self.print_out("%s, time %ds, %s." % (s, (time.time() - start_time), str(time.ctime())))
+        self.print_out("%s, time %ds, %s." % (s, (time.time() - start_time) + "  " + str(time.ctime())))
         return time.time()
 
 
@@ -63,7 +62,6 @@ def get_time():
 def get_config_proto(log_device_placement=False, allow_soft_placement=True):
     # GPU options:
     # https://www.tensorflow.org/versions/r0.10/how_tos/using_gpu/index.html
-    # 将 tf.v1.ConfigProto 的所有用法替换为 tf.config 中的等效函数。
     config_proto = tf.ConfigProto(
         log_device_placement=log_device_placement,
         allow_soft_placement=allow_soft_placement)
@@ -75,8 +73,7 @@ def debug_tensor(s, msg=None, summarize=10):
     """Print the shape and value of a tensor at test time. Return a new tensor."""
     if not msg:
         msg = s.name
-    # return tf.Print(s, [tf.shape(s), s], msg + " ", summarize=summarize)
-    return tf.raw_ops.Print(s, [tf.shape(s), s], msg + " ", summarize=summarize)
+    return tf.Print(s, [tf.shape(s), s], msg + " ", summarize=summarize)
 
 
 def has_nan(datum, tensor):
@@ -113,6 +110,3 @@ def Dist_mat(A):
     A2 = tf.tile(tf.expand_dims(A, 2), [1, 1, nnodes, 1])
     dist = tf.norm(A1 - A2, axis=3)
     return dist
-
-# t = tf.constant([[[1, 1, 1], [2, 2, 2]], [[3, 3, 3], [4, 4, 4]]])
-# tf.shape(t)
