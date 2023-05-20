@@ -88,7 +88,8 @@ class AgentVRP:
                 (self.i > 0) & self.from_depot[:, None, :])
 
         # We can choose depot if 1) we are not in depot OR 2) all nodes are visited
-        mask_depot = self.from_depot & (tf.reduce_sum(tf.cast(mask_loc == False, tf.int32), axis=-1) > 0)
+        # mask_depot = self.from_depot & (tf.reduce_sum(tf.cast(mask_loc == False, tf.int32), axis=-1) > 0)
+        mask_depot = self.from_depot & (tf.reduce_sum(tf.cast(mask_loc is False, tf.int32), axis=-1) > 0)
 
         return tf.concat([mask_depot[:, :, None], mask_loc], axis=-1)
 
@@ -110,8 +111,8 @@ class AgentVRP:
         self.used_capacity = (self.used_capacity + selected_demand) * (1.0 - tf.cast(self.from_depot, tf.float32))
 
         # Update visited nodes (set 1 to visited nodes)
-        idx = tf.cast(tf.concat((self.ids, self.scatter_zeros, self.prev_a), axis=-1), tf.int32)[:, None,
-              :]  # (batch_size, 1, 3)
+        # (batch_size, 1, 3)
+        idx = tf.cast(tf.concat((self.ids, self.scatter_zeros, self.prev_a), axis=-1), tf.int32)[:, None, :]
         self.visited = tf.tensor_scatter_nd_update(self.visited, idx, self.step_updates)  # (batch_size, 1, n_nodes)
 
         self.i = self.i + 1
