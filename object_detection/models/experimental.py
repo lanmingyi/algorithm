@@ -134,9 +134,10 @@ def attempt_load(weights, map_location=None):
     model = Ensemble()
     for w in weights if isinstance(weights, list) else [weights]:
         attempt_download(w)
-        print('torch.load(w, map_location=map_location', torch.load(w, map_location=map_location))
-        model.append(torch.load(w, map_location=map_location)['model'].float().fuse().eval())  # load FP32 model
-        # model.append(torch.load(w, map_location=lambda map_location, loc: map_location)['model'].float().fuse().eval())  # load FP32 model
+        # print('torch.load(w, map_location=map_location', torch.load(w, map_location=lambda map_location, loc: map_location))
+        print('11111111')
+        # model.append(torch.load(w, map_location=map_location)['model'].float().fuse().eval())  # load FP32 model
+        model.append(torch.load(w, map_location=lambda map_location, loc: map_location)['model'].float().fuse().eval())  # load FP32 model
 
     # Compatibility updates
     for m in model.modules():

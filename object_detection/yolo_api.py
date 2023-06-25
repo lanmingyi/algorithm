@@ -22,30 +22,28 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 
-
-@app.route('/upload', methods=['GET', 'POST'])
-def upload_file():
+@app.route('/objectDetection', methods=['GET', 'POST'])
+def detection_file():
     initialize()
-    print('request', request.files)
-    file = request.files['file']
-
-    if file and allowed_file(file.filename):
-        src_path = os.path.join('object_detection/uploads', file.filename)
-        file.save(src_path)
-        shutil.copy(src_path, 'object_detection/images')
-        image_path = os.path.join('object_detection/images', file.filename)
-        print('image_path', image_path)
-        print('Detector()', Detector())
-        print('file.filename', file.filename.rsplit('.', 1)[1])
-        pid, image_info = c_main(
-            image_path, Detector(), file.filename.rsplit('.', 1)[1])
+    data = request.json
+    image_path = os.path.join('D:/usr/server/upload/', data['filename'])
+    pid, image_info = c_main(image_path, Detector(), data['filename'].split('/')[1].split('.')[0])
+    if pid:
         return jsonify({'status': 1,
-                        'image_url': 'http://127.0.0.1:50000/object_detection/images/' + pid,
-                        'draw_url': 'http://127.0.0.1:50000/object_detection/results/' + pid,
-                        'image_info': image_info})
-    # print('jsonify', jsonify)
+                    'resultUrl': 'http://127.0.0.1:50000/object_detection/results/' + pid,
+                    'image_info': image_info})
+    else:
+        return jsonify({'status': 0})
 
-    return jsonify({'status': 0})
+    # if file and allowed_file(file.filename):
+    #     src_path = os.path.join('object_detection/uploads', file.filename)
+    #     file.save(src_path)
+    #     shutil.copy(src_path, 'object_detection/images')
+    #     image_path = os.path.join('object_detection/images', file.filename)
+    #     print('image_path', image_path)
+    #     print('Detector()', Detector())
+    #     print('file.filename', file.filename.rsplit('.', 1)[1])
+
 
 
 @app.route("/download", methods=['GET'])
