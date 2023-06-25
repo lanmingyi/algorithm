@@ -16,11 +16,11 @@ class Detector(object):
         self.init_model()
 
     def init_model(self):
-        self.weights = 'D://bc/cv-algorithm/object_detection/weights/yolov5s.pt'
+        self.weights = 'D://bc/algorithm/object_detection/weights/yolov5s.pt'
         self.device = '0' if torch.cuda.is_available() else 'cpu'
         self.device = select_device(self.device)
-        # model = attempt_load(self.weights, map_location=self.device)
-        model = model = torch.hub.load("ultralytics/yolov5", "yolov5s", path='object_detection/weights/yolov5s.pt', source='local', force_reload=True).to(self.device)
+        model = attempt_load(self.weights, map_location=self.device)
+        # model = torch.hub.load("ultralytics/yolov5", "yolov5s", path='object_detection/weights/yolov5s.pt', source='local', force_reload=True).to(self.device)
         # print('model', model)
         model.to(self.device).eval()
         # print('model.to(self.device).eval()', model.to(self.device).eval())

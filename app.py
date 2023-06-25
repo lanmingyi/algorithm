@@ -8,7 +8,7 @@ from datetime import timedelta
 
 from image_processing.views import testview, basicFuncViews, histogramViews, segmentationViews, smoothSharpenViews, \
     repairViews, morphologicalViews, filesViews
-# from object_detection import yolo_api
+from object_detection import yolo_api
 # from openpose import pose_api
 from landslide_detection.da_unet import da_unet_api
 
@@ -26,7 +26,7 @@ app.register_blueprint(morphologicalViews.app)
 app.register_blueprint(repairViews.app)
 
 # object detection
-# app.register_blueprint(yolo_api.app)
+app.register_blueprint(yolo_api.app)
 
 # openpose
 # app.register_blueprint(pose_api.app)
@@ -40,13 +40,13 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = timedelta(seconds=1)
 flask_cors.CORS(app, resources=r'/*')
 
 # # 添加header解决跨域
-# @app.after_request
-# def after_request(response):
-#     response.headers['Access-Control-Allow-Origin'] = '*'
-#     response.headers['Access-Control-Allow-Credentials'] = 'true'
-#     response.headers['Access-Control-Allow-Methods'] = 'POST'
-#     response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-Requested-With'
-#     return response
+@app.after_request
+def after_request(response):
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Credentials'] = 'true'
+    response.headers['Access-Control-Allow-Methods'] = 'POST'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type, X-Requested-With'
+    return response
 
 # app = Flask(__name__)
 
