@@ -40,6 +40,10 @@ from utils.downloads import gsutil_getsize
 from utils.metrics import box_iou, fitness
 
 FILE = Path(__file__).resolve()
+# print('FILE.parents', FILE.parents)
+# print('FILE.parents[0]', FILE.parents[0])
+# print('FILE.parents[1]', FILE.parents[1])
+# print('FILE.parents[2]', FILE.parents[2])
 ROOT = FILE.parents[1]  # YOLOv5 root directory
 RANK = int(os.getenv('RANK', -1))
 
@@ -126,7 +130,7 @@ def set_logging(name=None, verbose=VERBOSE):
 
 
 set_logging()  # run before defining LOGGER
-LOGGER = logging.getLogger("yolov5")  # define globally (used in train.py, val.py, detect.py, etc.)
+LOGGER = logging.getLogger("algorithm")  # define globally (used in train.py, val.py, detect.py, etc.)
 if platform.system() == 'Windows':
     for fn in LOGGER.info, LOGGER.warning:
         setattr(LOGGER, fn.__name__, lambda x: fn(emojis(x)))  # emoji safe logging
@@ -216,6 +220,9 @@ def print_args(args: Optional[dict] = None, show_file=True, show_func=False):
         args, _, _, frm = inspect.getargvalues(x)
         args = {k: v for k, v in frm.items() if k in args}
     try:
+        # print(Path(file))
+        # print(Path(file).resolve())
+        # print(Path(file).resolve().relative_to(ROOT))
         file = Path(file).resolve().relative_to(ROOT).with_suffix('')
     except ValueError:
         file = Path(file).stem
@@ -350,9 +357,16 @@ def check_requirements(requirements=ROOT / 'requirements.txt', exclude=(), insta
     check_python()  # check python version
     if isinstance(requirements, Path):  # requirements.txt file
         file = requirements.resolve()
+        #   assert() 的用法很简单，我们只要传入一个表达式，它会计算这个表达式的结果：
+        #   如果表达式的结果为“假”，assert() 会打印出断言失败的信息，并调用 abort() 函数终止程序的执行；
+        #   如果表达式的结果为“真”，assert() 就什么也不做，程序继续往后执行。
         assert file.exists(), f"{prefix} {file} not found, check failed."
         with file.open() as f:
             requirements = [f'{x.name}{x.specifier}' for x in pkg.parse_requirements(f) if x.name not in exclude]
+            # for x in pkg.parse_requirements(f):
+            #     print('x', x)
+            #     print('x.name', x.name)
+            #     print('x.specifier', x.specifier)
     elif isinstance(requirements, str):
         requirements = [requirements]
 
@@ -648,6 +662,8 @@ def one_cycle(y1=0.0, y2=1.0, steps=100):
 
 
 def colorstr(*input):
+    # print('input', input)  # ('detect: ',)
+    # print('*input', *input)  # detect:
     # Colors a string https://en.wikipedia.org/wiki/ANSI_escape_code, i.e.  colorstr('blue', 'hello world')
     *args, string = input if len(input) > 1 else ('blue', 'bold', input[0])  # color arguments, string
     colors = {
@@ -670,7 +686,12 @@ def colorstr(*input):
         'end': '\033[0m',  # misc
         'bold': '\033[1m',
         'underline': '\033[4m'}
+    # print("''.join(colors[x] for x in args)", ''.join(colors[x] for x in args))
+    # print("f'{string}'", f'{string}')
+    # print("colors['end']", colors['end'])
+    # print(".join(colors[x] for x in args) + f'{string}' + colors['end']", ''.join(colors[x] for x in args) + f'{string}' + colors['end'])
     return ''.join(colors[x] for x in args) + f'{string}' + colors['end']
+    # return ''.join(colors[x] for x in args) + string + colors['end']
 
 
 def labels_to_class_weights(labels, nc=80):
