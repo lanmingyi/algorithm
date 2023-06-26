@@ -87,6 +87,7 @@ def attempt_load(weights, device=None, inplace=True, fuse=True):
 
         model.append(ckpt.fuse().eval() if fuse and hasattr(ckpt, 'fuse') else ckpt.eval())  # model in eval mode
 
+    print('model.modules()', model.modules())
     # Module compatibility updates
     for m in model.modules():
         t = type(m)
@@ -98,6 +99,8 @@ def attempt_load(weights, device=None, inplace=True, fuse=True):
         elif t is nn.Upsample and not hasattr(m, 'recompute_scale_factor'):
             m.recompute_scale_factor = None  # torch 1.11.0 compatibility
 
+    print('len(model)', len(model))
+    print('model[-1]', model[-1])
     # Return model
     if len(model) == 1:
         return model[-1]
