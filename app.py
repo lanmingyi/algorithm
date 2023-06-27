@@ -5,15 +5,19 @@ from flask import *
 import flask_cors
 import cv2
 from datetime import timedelta
+from pathlib import Path
 
 from image_processing.views import testview, basicFuncViews, histogramViews, segmentationViews, smoothSharpenViews, \
     repairViews, morphologicalViews, filesViews
-from object_detection import yolo_api
+from object_detection import object_detection_api
 # from openpose import pose_api
 from landslide_detection.da_unet import da_unet_api
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
+FILE = Path(__file__).resolve()
+# print('file', FILE.parents[0])
+# print('file', FILE)
 
 # image processing
 app.register_blueprint(testview.app)
@@ -25,8 +29,10 @@ app.register_blueprint(smoothSharpenViews.app)
 app.register_blueprint(morphologicalViews.app)
 app.register_blueprint(repairViews.app)
 
+print('object_detection_api', object_detection_api)
+print('object_detection_api.app', object_detection_api.app)
 # object detection
-app.register_blueprint(yolo_api.app)
+app.register_blueprint(object_detection_api.app)
 
 # openpose
 # app.register_blueprint(pose_api.app)
@@ -38,6 +44,7 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = timedelta(seconds=1)
 
 # 跨域
 flask_cors.CORS(app, resources=r'/*')
+
 
 # # 添加header解决跨域
 @app.after_request
@@ -76,13 +83,6 @@ class VideoCamera(object):
         return jpeg.tobytes()
 
 
-@app.route('/')
-def index():
-    """Video streaming home page."""
-    # return render_template('index.html')
-    return redirect(url_for('static', filename='./index.html'))
-
-
 def gen(camera):
     """Video streaming generator function."""
     yield b'--frame\r\n'
@@ -98,9 +98,32 @@ def video_feed():
     return Response(gen(VideoCamera()), mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
+# @app.route('/')
+# def index():
+#     """home page."""
+#     # return render_template('./index.html')
+#     # return redirect(url_for('static', filename='./index.html'))
+
+
+@app.route('/<path:file>', methods=['GET'])
+def show_photo(file):
+    if request.method == 'GET':
+        if not file is None:
+            # print('FILE.parents[0]', FILE.parents[0] / f'{file}')
+            image_data = open(FILE.parents[0] / f'{file}', "rb").read()
+            response = make_response(image_data)
+            response.headers['Content-Type'] = 'image/png'
+            return response
+
+
+@app.route("/download", methods=['GET'])
+def download_file():
+    # 需要知道2个参数, 第1个参数是本地目录的path, 第2个参数是文件名(带扩展名)
+    return send_from_directory('object_detection/data', 'testfile.zip', as_attachment=True)
+
+
 def initialize():
-    files = ['landslide_detection/results', 'image_processing/results',
-             'object_detection/uploads', 'object_detection/images', 'object_detection/results']
+    files = ['results', 'landslide_detection/results', 'image_processing/results']
     for ff in files:
         if not os.path.exists(ff):
             os.makedirs(ff)
