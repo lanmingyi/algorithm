@@ -11,6 +11,7 @@ __pycache__/
 *.t7
 *.weights
 *.h5
+*.pt
 *.dll
 *.caffemodel
 *.rar
