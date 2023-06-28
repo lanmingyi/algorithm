@@ -2,6 +2,7 @@
 .idea
 *.npy
 *.vs
+*.ipynb_checkpoints
 
 # output/
 
