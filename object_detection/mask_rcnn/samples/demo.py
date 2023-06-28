@@ -1,13 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# # Mask R-CNN Demo
-# 
-# A quick intro to using the pre-trained model to detect and segment objects.
-
-# In[ ]:
-
-
 import os
 import sys
 import random
@@ -19,7 +9,9 @@ import matplotlib.pyplot as plt
 
 # Root directory of the project
 ROOT_DIR = os.path.abspath("../")  # 返回绝对路径
-print('ROOT_DIR', ROOT_DIR)
+MODEL_DIR = os.path.abspath("../../../")  # 返回绝对路径
+# print('ROOT_DIR', ROOT_DIR)
+# print('MODEL_DIR', MODEL_DIR)
 
 # Import Mask RCNN
 sys.path.append(ROOT_DIR)  # To find local version of the library
@@ -38,11 +30,10 @@ matplotlib.use('QT5Agg')
 # get_ipython().run_line_magic('matplotlib', 'inline')
 
 # Directory to save logs and trained model
-MODEL_DIR = os.path.join(ROOT_DIR, "logs")
-print('ROOT_DIR', ROOT_DIR)
+# MODEL_DIR = os.path.join(ROOT_DIR, "logs")
 
 # Local path to trained weights file
-COCO_MODEL_PATH = os.path.join(ROOT_DIR, "models/mask_rcnn_coco.h5")
+COCO_MODEL_PATH = os.path.join(MODEL_DIR, "models/mask_rcnn_coco.h5")
 print(COCO_MODEL_PATH)
 # Download COCO trained weights from Releases if needed
 if not os.path.exists(COCO_MODEL_PATH):
@@ -73,9 +64,6 @@ config.display()
 
 # ## Create Model and Load Trained Weights
 
-# In[3]:
-
-
 # Create model object in inference mode.
 model = modellib.MaskRCNN(mode="inference", model_dir=MODEL_DIR, config=config)
 
@@ -84,27 +72,6 @@ model.load_weights(COCO_MODEL_PATH, by_name=True)
 
 
 # ## Class Names
-# 
-# The model classifies objects and returns class IDs, which are integer value that identify each class. Some datasets assign integer values to their classes and some don't. For example, in the MS-COCO dataset, the 'person' class is 1 and 'teddy bear' is 88. The IDs are often sequential, but not always. The COCO dataset, for example, has classes associated with class IDs 70 and 72, but not 71.
-# 
-# To improve consistency, and to support training on data from multiple sources at the same time, our ```Dataset``` class assigns it's own sequential integer IDs to each class. For example, if you load the COCO dataset using our ```Dataset``` class, the 'person' class would get class ID = 1 (just like COCO) and the 'teddy bear' class is 78 (different from COCO). Keep that in mind when mapping class IDs to class names.
-# 
-# To get the list of class names, you'd load the dataset and then use the ```class_names``` property like this.
-# ```
-# # Load COCO dataset
-# dataset = coco.CocoDataset()
-# dataset.load_coco(COCO_DIR, "train")
-# dataset.prepare()
-# 
-# # Print class names
-# print(dataset.class_names)
-# ```
-# 
-# We don't want to require you to download the COCO dataset just to run this demo, so we're including the list of class names below. The index of the class name in the list represent its ID (first class is 0, second is 1, third is 2, ...etc.)
-
-# In[ ]:
-
-
 # COCO Class names
 # Index of the class in the list is its ID. For example, to get ID of
 # the teddy bear class, use: class_names.index('teddy bear')
