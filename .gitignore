@@ -1,11 +1,16 @@
 ## ide
 .idea
 *.npy
+*.vs
 
 # output/
 
 # Folders
 __pycache__/
+bin/
+Debug/
+Release/
+x64/
 
 # Files
 *.t7
