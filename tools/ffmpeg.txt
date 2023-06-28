@@ -1,0 +1,33 @@
+1.============裁剪=================================
+ffmpeg -ss START -t DURATION -i INPUT -vcodec copy -acodec copy OUTPUT
+
+$ ffmpeg -ss [start] -i [input] -t [duration] -c copy [output]
+$ ffmpeg -ss [start] -i [input] -to [end] -c copy [output]
+
+ffmpeg -ss 00:21:05  -i new-6.mp4 -to 00:28:53 -c copy yang.mp4
+
+对上面的命令稍做个解释。
+-ss 开始时间，如： 00:00:20，表示从20秒开始；
+-t 时长，如： 00:00:10，表示截取10秒长的视频；如果不设定，表示裁剪到文件尾
+-i 输入，后面是空格，紧跟着就是输入视频文件；
+-vcodec copy 和 -acodec copy表示所要使用的视频和音频的编码格式，这里指定为copy表示原样拷贝；
+INPUT，输入视频文件；
+OUTPUT，输出视频文件；
+
+2============裁剪=================================
+示例：ffmpeg -i origin.mp4 -vcodec copy -acodec copy -ss 00:01:26 -to 00:01:30 output.mp4 -y
+解释：ffmpeg -i 原始视频文件 -vcodec copy -acodec copy -ss 开始时间 -to 结束时间 处理后视频文件 -y
+-y输出覆盖同名的文件
+
+3===============视频转换格式===================================
+ffmpeg -i test.avi test.mp4
+比如一个视频的编码是MPEG4，想用H264编码，咋办？
+ffmpeg -i input.mp4 -vcodec h264 output.mp4
+ffmpeg -i test-1.mp4 -vcodec h264 output.mp4
+相反也一样
+ffmpeg -i input.mp4 -vcodec mpeg4 output.mp4
+
+4===============降低码率========================
+ffmpeg -i demo.mp4 -b:v 2500k  output.mp4
+
+-b:v主要是控制平均码率

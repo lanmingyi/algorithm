@@ -1,0 +1,18 @@
+.\download-models.ps1 : 无法加载文件 D:\LMY_Code\ASL_Active_Learning\yolo-hand-detection\models\download-models.ps1。未
+对文件 D:\LMY_Code\ASL_Active_Learning\yolo-hand-detection\models\download-models.ps1 进行数字签名。无法在当前系统上运
+行该脚本。有关运行脚本和设置执行策略的详细信息，请参阅 https:/go.microsoft.com/fwlink/?LinkID=135170 中的 about_Executi
+on_Policies。
+所在位置 行:1 字符: 1
++ .\download-models.ps1
++ ~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : SecurityError: (:) []，PSSecurityException
+    + FullyQualifiedErrorId : UnauthorizedAccess
+
+
+解决方法：
+
+在powershell中执行 Start-Process powershell -Verb runAs
+
+会提示授权，并以管理员身份运行powershell
+
+继续重新执行 set-ExecutionPolicy RemoteSigned 选择 Y
