@@ -1843,7 +1843,7 @@ class MaskRCNN(object):
         assert mode in ['training', 'inference']
 
         # Image size must be dividable by 2 multiple times
-        h, w = config.IMAGE_SHAPE[:2]
+        h, w = config.IMAGE_SHAPE[:2]  # 相当于[0:2)或[0:1]
         if h / 2**6 != int(h / 2**6) or w / 2**6 != int(w / 2**6):
             raise Exception("Image size must be dividable by 2 at least 6 times "
                             "to avoid fractions when downscaling and upscaling."
