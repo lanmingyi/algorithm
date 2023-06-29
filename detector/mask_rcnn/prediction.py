@@ -3,17 +3,25 @@ from detector.mask_rcnn.mrcnn import model as modellib, utils
 from detector.mask_rcnn.mrcnn import visualize
 from detector.mask_rcnn.timer import Timer
 import os
+from pathlib import Path
 import sys
 import cv2
 import skimage.io
 import time
 import random
 
+
 # Root directory of the project.
-ROOT_DIR = os.path.abspath("../../")
-print('ROOT_DIR', ROOT_DIR)
+# ROOT_DIR = os.path.abspath("../../")
+# print('ROOT_DIR', ROOT_DIR)
+# WEIGHTS_PATH = os.path.join(ROOT_DIR, "models/mask_rcnn_coco.h5")
+# RESULT_PATH = os.path.join(ROOT_DIR, "results")
+# print('WEIGHTS_PATH', WEIGHTS_PATH)
+
+FILE = Path(__file__).resolve()
+ROOT_DIR = FILE.parents[2]  # root directory
 WEIGHTS_PATH = os.path.join(ROOT_DIR, "models/mask_rcnn_coco.h5")
-print('WEIGHTS_PATH', WEIGHTS_PATH)
+RESULT_PATH = os.path.join(ROOT_DIR, "results")
 
 
 # Import Mask RCNN
@@ -39,7 +47,13 @@ class MaskRCNNConfig(Config):
     DETECTION_MIN_CONFIDENCE = 0.9
 
 
-def run():
+def run(image_path):
+    from tensorflow.compat.v1 import ConfigProto
+    from tensorflow.compat.v1 import InteractiveSession
+    config = ConfigProto()
+    config.gpu_options.allow_growth = True
+    session = InteractiveSession(config=config)
+
     config = MaskRCNNConfig()
     # Create model
     model = modellib.MaskRCNN(mode="inference", config=config, model_dir='models')
@@ -63,12 +77,15 @@ def run():
                    'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors',
                    'teddy bear', 'hair drier', 'toothbrush']
 
-    # IMAGE_DIR = 'datasets/test'
     IMAGE_DIR = 'images'
     IMAGE_NAME = '12283150_12d37e6389_z.jpg'
     # IMAGE_NAME = '3627527276_6fe8cd9bfe_z.jpg'
     # images = cv2.imread('datasets/test/2.jpg')
-    images = skimage.io.imread(os.path.join(IMAGE_DIR, IMAGE_NAME))
+    # images = skimage.io.imread(os.path.join(IMAGE_DIR, IMAGE_NAME))
+    # image_path = os.path.join(IMAGE_DIR, IMAGE_NAME)
+    images = skimage.io.imread(image_path)
+    RESULT_NAME = image_path.split('/')[-1]
+    save_path = os.path.join(RESULT_PATH, RESULT_NAME)
     time1 = time.time()
     results = model.detect([images])
     # print(results[0])
@@ -78,9 +95,11 @@ def run():
     r = results[0]
     print('分数：{}'.format(r['scores']))
     # print('类别：{}'.format(class_names[class_ids]))
-    visualize.display_instances(images, r['rois'], r['masks'], r['class_ids'],
-                                class_names, r['scores'], title='识别结果')
+    # visualize.display_instances(images, r['rois'], r['masks'], r['class_ids'],
+    #                             class_names, r['scores'], title='识别结果')
 
+    visualize.save_instances(images, RESULT_PATH, RESULT_NAME, r['rois'], r['masks'], r['class_ids'],
+                            class_names, r['scores'], title='')
     # # Load a random image from the images folder
     # file_names = next(os.walk(IMAGE_DIR))[2]
     #
@@ -92,8 +111,9 @@ def run():
     #     r = results[0]
     #     visualize.display_instances(image, r['rois'], r['masks'], r['class_ids'],
     #                                 class_names, r['scores'])
-    return 0
+    return save_path
 
 
 if __name__ == "__main__":
-    run()
+    image_path = os.path.join('D:/usr/server/upload/', 'temp/3627527276_6fe8cd9bfe_z_1688017248505.jpg')
+    run(image_path)

@@ -11,7 +11,8 @@ from image_processing.views import testview, basicFuncViews, histogramViews, seg
     repairViews, morphologicalViews, filesViews
 from detector import detect_api
 # from openpose import pose_api
-from landslide_detection.da_unet import da_unet_api
+# from landslide_detection.da_unet import da_unet_api
+
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -29,15 +30,13 @@ app.register_blueprint(smoothSharpenViews.app)
 app.register_blueprint(morphologicalViews.app)
 app.register_blueprint(repairViews.app)
 
-print('detect_api', detect_api)
-print('detect_api.app', detect_api.app)
 # object detection
 app.register_blueprint(detect_api.app)
 
 # openpose
 # app.register_blueprint(pose_api.app)
 # landslide detection
-app.register_blueprint(da_unet_api.app)
+# app.register_blueprint(da_unet_api.app)
 
 # 解决缓存刷新问题
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = timedelta(seconds=1)
