@@ -9,7 +9,7 @@ from pathlib import Path
 
 from image_processing.views import testview, basicFuncViews, histogramViews, segmentationViews, smoothSharpenViews, \
     repairViews, morphologicalViews, filesViews
-from object_detection import object_detection_api
+from detector import detect_api
 # from openpose import pose_api
 from landslide_detection.da_unet import da_unet_api
 
@@ -29,10 +29,10 @@ app.register_blueprint(smoothSharpenViews.app)
 app.register_blueprint(morphologicalViews.app)
 app.register_blueprint(repairViews.app)
 
-print('object_detection_api', object_detection_api)
-print('object_detection_api.app', object_detection_api.app)
+print('detect_api', detect_api)
+print('detect_api.app', detect_api.app)
 # object detection
-app.register_blueprint(object_detection_api.app)
+app.register_blueprint(detect_api.app)
 
 # openpose
 # app.register_blueprint(pose_api.app)
@@ -119,7 +119,8 @@ def show_photo(file):
 @app.route("/download", methods=['GET'])
 def download_file():
     # 需要知道2个参数, 第1个参数是本地目录的path, 第2个参数是文件名(带扩展名)
-    return send_from_directory('object_detection/data', 'testfile.zip', as_attachment=True)
+    # return send_from_directory('object_detection/data', 'testfile.zip', as_attachment=True)
+    return send_from_directory('results', 'testfile.zip', as_attachment=True)
 
 
 def initialize():
