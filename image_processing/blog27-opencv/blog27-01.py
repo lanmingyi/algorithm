@@ -1,12 +1,12 @@
-# -*- coding: utf-8 -*-
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 
+
 # 绘制图像函数
 def display():
     # 清除屏幕及深度缓存
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     # 设置红色
     glColor3f(1.0, 0.0, 0.0)
     # 开始绘制四边形
@@ -20,6 +20,7 @@ def display():
     glEnd()
     # 清空缓冲区并将指令送往硬件执行
     glFlush()
+
 
 # 主函数
 if __name__ == "__main__":

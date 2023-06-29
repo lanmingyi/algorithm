@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
@@ -8,6 +7,7 @@ import time
 h = 0
 m = 0
 s = 0
+
 
 # 绘制图像函数
 def Draw():
@@ -59,6 +59,7 @@ def Draw():
     glEnd()
     glFlush()
 
+
 # 更新时间函数
 def Update():
     global h, m, s
@@ -68,6 +69,7 @@ def Update():
     s = int(time.strftime('%S', t))
     glutPostRedisplay()
 
+
 # 主函数
 if __name__ == "__main__":
     glutInit()
@@ -76,4 +78,4 @@ if __name__ == "__main__":
     glutCreateWindow("My clock")
     glutDisplayFunc(Draw)
     glutIdleFunc(Update)
-    glutMainLoop() 
+    glutMainLoop()

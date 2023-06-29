@@ -1,29 +1,29 @@
-# -*- coding: utf-8 -*-
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 
+
 # 绘制图像函数
 def display():
     # 清除屏幕及深度缓存
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     # 绘制线段
     glBegin(GL_LINES)
-    glVertex2f(-1.0, 0.0)       # 左下角顶点
-    glVertex2f(1.0, 0.0)        # 右下角顶点
-    glVertex2f(0.0, 1.0)        # 右上角顶点
-    glVertex2f(0.0, -1.0)       # 左上角顶点
+    glVertex2f(-1.0, 0.0)  # 左下角顶点
+    glVertex2f(1.0, 0.0)  # 右下角顶点
+    glVertex2f(0.0, 1.0)  # 右上角顶点
+    glVertex2f(0.0, -1.0)  # 左上角顶点
     glEnd()
 
     # 绘制顶点
     glPointSize(10.0)
     glBegin(GL_POINTS)
-    glColor3f(1.0, 0.0, 0.0)    # 红色
+    glColor3f(1.0, 0.0, 0.0)  # 红色
     glVertex2f(0.3, 0.3)
-    glColor3f(0.0, 1.0, 0.0)    # 绿色
+    glColor3f(0.0, 1.0, 0.0)  # 绿色
     glVertex2f(0.5, 0.6)
-    glColor3f(0.0, 0.0, 1.0)    # 蓝色
+    glColor3f(0.0, 0.0, 1.0)  # 蓝色
     glVertex2f(0.9, 0.9)
     glEnd()
 
@@ -57,11 +57,12 @@ def display():
     glVertex2f(0.5, -0.5)
     glVertex2f(0.3, -0.3)
     glVertex2f(0.2, -0.6)
-    
+
     # 结束绘制四边形
     glEnd()
     # 清空缓冲区并将指令送往硬件执行
     glFlush()
+
 
 # 主函数
 if __name__ == "__main__":

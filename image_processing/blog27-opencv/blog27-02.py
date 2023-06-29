@@ -1,22 +1,23 @@
-# -*- coding: utf-8 -*-
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 
+
 # 绘制图像函数
 def drawFunc():
     # 清除屏幕及深度缓存
-    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     # 设置绕轴旋转(角度,x,y,z)
     glRotatef(0.1, 5, 5, 0)
-    
+
     # 绘制实心茶壶
     # glutSolidTeapot(0.5)
     # 绘制线框茶壶
     glutWireTeapot(0.5)
-    
+
     # 刷新显示图像
     glFlush()
+
 
 # 主函数
 if __name__ == "__main__":
