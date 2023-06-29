@@ -1,8 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Jan 14 2020
-
-"""
 import os
 import cv2
 import numpy as np

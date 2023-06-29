@@ -1,4 +1,3 @@
-#coding=utf-8
 from os.path import join
 import torch
 from PIL import Image, ImageEnhance

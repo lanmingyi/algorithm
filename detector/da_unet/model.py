@@ -1,8 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Jan 14 2020
-
-"""
 # import tensorflow as tf
 # import tensorflow.contrib.slim as slim
 import tensorflow.compat.v1 as tf
