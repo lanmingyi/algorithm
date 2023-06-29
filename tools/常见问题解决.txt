@@ -1,0 +1,15 @@
+1.ModuleNotFoundError: No module named ‘pip‘问题
+python -m ensurepip
+python -m pip install --upgrade pip
+即可
+
+2. vs2019 v16.9编译openpse报错： field of class type without a DLL interface used in a class with a DLL interface
+A possible workaround, based on what is suggested at the following link
+https://devtalk.blender.org/t/cuda-compile-error-windows-10/17886/5
+In the files "cuda.hu" and "resizeAndMergeBase.cu", substitute floor with floorf.
+I was able to compile the solution.
+
+3.双系统时间误差
+sudo apt-get install ntpdate  # 在ubuntu下更新本地时间
+sudo ntpdate time.windows.com
+sudo hwclock --localtime --systohc  # 将本地时间更新到硬件上

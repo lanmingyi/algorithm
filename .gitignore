@@ -1,11 +1,23 @@
 ## ide
 .idea
 *.npy
+<<<<<<< HEAD
+=======
+*.vs
+*.ipynb_checkpoints
+>>>>>>> ba36716a91528dda88eba2e1c1b7c860e83e41cc
 
 # output/
 
 # Folders
 __pycache__/
+<<<<<<< HEAD
+=======
+bin/
+Debug/
+Release/
+x64/
+>>>>>>> ba36716a91528dda88eba2e1c1b7c860e83e41cc
 
 # Files
 *.t7
