@@ -19,19 +19,17 @@ def run(image_path):
     size = 512
     over_lap = 256
     img = tf.placeholder(tf.float32, [batch_size, size, size, 3])
-    pred = tf.nn.sigmoid(da_u_net(img, is_training=False))
-    print('pred', pred)
+    # pred = tf.nn.sigmoid(da_u_net(img, is_training=False))
+    pred = da_u_net(img, is_training=False)
+
     saver = tf.train.Saver(var_list=tf.global_variables())
     with tf.Session() as sess:
-        print('sess', sess)
         RESULT_NAME = image_path.split('/')[-1].split('.')[0] + '.jpg'
         save_path = os.path.join(RESULT_PATH, RESULT_NAME)
 
         tf.global_variables_initializer().run()
         ckpt = tf.train.get_checkpoint_state(checkpoint_dir)
-        print('ckpt', ckpt)
         if ckpt and ckpt.model_checkpoint_path:
-            print('ckpt1', ckpt)
             ckpt_name = os.path.basename(ckpt.model_checkpoint_path)
             saver.restore(sess, os.path.join(checkpoint_dir, ckpt_name))
         print('Loading Checkpoint Success !')
@@ -41,7 +39,7 @@ def run(image_path):
         # img1 = cv2.resize(img1,(512, 512))
         # ori_image = np.uint8(img1)
         ori_image = ori_image[..., 0:3]
-        print('Start to cutting {}'.format(image_path))
+
         image_list = []
         predict_list = []
         oh, ow = ori_image.shape[0], ori_image.shape[1]
@@ -61,9 +59,6 @@ def run(image_path):
         for w in range(w_step):
             image_list.append(ori_image[-size:, (w * dert):(w * dert + size), :])
         image_list.append(ori_image[-size:, -size:, :])
-        print(len(image_list))
-
-        print('Start to predict {}'.format(image_path))
 
         for x_batch1 in image_list:
             x_batch = np.expand_dims(x_batch1, axis=0) / 255.0
@@ -76,7 +71,7 @@ def run(image_path):
         tmp = np.ones([ori_image.shape[0], ori_image.shape[1]]).astype(np.uint8)
         big_w = size - over_lap // 2
         small_w = over_lap//2
-        print('Start to cut {}'.format(image_path))
+
         for h in range(h_step):
             for w in range(w_step):
                 if h == 0 or h == h_step-1:
@@ -88,8 +83,11 @@ def run(image_path):
                 else:
                     dw = dert
 
+                # tmp[0: 384, 0:384]
+                # predict_list[0][0: 384, 0: 384]
                 tmp[(h-1) * over_lap+(big_w if h > 0 else over_lap):(h-1) * over_lap+(big_w if h > 0 else over_lap)+dh, (w - 1)*over_lap+(big_w if w > 0 else over_lap):(w-1)*over_lap+(big_w if w > 0 else over_lap)+dw] \
                     = predict_list[count_temp][small_w*int(h > 0):dh+small_w*int(h > 0), small_w*int(w > 0):dw+small_w*int(w > 0)]
+
                 count_temp += 1
             tmp[(h-1) * over_lap + (big_w if h > 0 else over_lap):(h-1) * over_lap + (big_w if h > 0 else over_lap)+dh, -w_rest:] \
                 = predict_list[count_temp][small_w if h > 0 else 0:(small_w if h > 0 else 0)+dh, -w_rest:]
@@ -101,8 +99,6 @@ def run(image_path):
         tmp[-h_rest:, -w_rest:] = predict_list[count_temp][-h_rest:, -w_rest:]
 
         tmp[tmp == 1] = 255
-        print('tmp', tmp)
-        print('Save {}'.format(save_path))
         cv2.imwrite(save_path, tmp)
         sess.close()
 
