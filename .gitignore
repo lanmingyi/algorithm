@@ -1,6 +1,5 @@
 ## ide
 .idea
-*.npy
 *.vs
 *.ipynb_checkpoints
 
@@ -26,3 +25,4 @@ results/
 *.zip
 *.mp4
 *.tif
+#*.npy

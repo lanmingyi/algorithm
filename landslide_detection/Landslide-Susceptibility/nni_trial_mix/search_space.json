@@ -1,7 +1,0 @@
-{
-    "window_size":{"_type":"choice","_value":[3,5]},
-    "optimizer":{"_type":"choice","_value":["Adam", "SGD"]},
-    "learning_rate":{"_type":"uniform","_value":[0.0001, 0.0005]},
-    "dense_size":{"_type":"randint","_value":[ 5,100 ]},
-    "Dropout_rate":{"_type":"uniform","_value":[ 0,1 ]}
-}
