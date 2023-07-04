@@ -1,0 +1,9 @@
+.env
+.python-version
+.idea
+__pycache__
+test
+data
+
+*.pth
+*.pb
