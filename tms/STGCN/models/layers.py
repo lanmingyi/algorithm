@@ -3,7 +3,7 @@ import tensorflow.compat.v1 as tf
 
 def gconv(x, theta, Ks, c_in, c_out):
     '''
-    Spectral-based graph convolution function.
+    Spectral-based graph convolution function.  基于图谱的卷积函数
     :param x: tensor, [batch_size, n_route, c_in].
     :param theta: tensor, [Ks*c_in, c_out], trainable kernel parameters.
     :param Ks: int, kernel size of graph convolution.
@@ -62,6 +62,7 @@ def temporal_conv_layer(x, Kt, c_in, c_out, act_func='relu'):
         # if the size of input channel is less than the output,
         # padding x to the same size of output channel.
         # Note, _.get_shape() cannot convert a partially known TensorShape to a Tensor.
+        # tf.concat()拼接的张量只会改变一个维度，其他维度是保存不变的。比如两个shape为[2,3]的矩阵拼接，要么通过axis=0变成[4,3]，要么通过axis=1变成[2,6]。改变的维度索引对应axis的值。
         x_input = tf.concat([x, tf.zeros([tf.shape(x)[0], T, n, c_out - c_in])], axis=3)
     else:
         x_input = x

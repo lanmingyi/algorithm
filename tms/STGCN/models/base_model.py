@@ -1,4 +1,4 @@
-from models.layers import *
+from tms.STGCN.models.layers import *
 from os.path import join as pjoin
 import tensorflow.compat.v1 as tf
 
@@ -36,7 +36,7 @@ def build_model(inputs, n_his, Ks, Kt, blocks, keep_prob):
     return train_loss, single_pred
 
 
-def model_save(sess, global_steps, model_name, save_path='./output/models/'):
+def model_save(sess, global_steps, model_name, save_path='./output/models'):
     '''
     Save the checkpoint of trained model.
     :param sess: tf.Session().

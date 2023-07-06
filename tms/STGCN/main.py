@@ -10,10 +10,10 @@ config = tf.ConfigProto()
 config.gpu_options.allow_growth = True
 tf.Session(config=config)
 
-from utils.math_graph import *
-from data_loader.data_utils import *
-from models.trainer import model_train
-from models.tester import model_test
+from tms.STGCN.utils.math_graph import *
+from tms.STGCN.data_loader.data_utils import *
+from tms.STGCN.models.trainer import model_train
+from tms.STGCN.models.tester import model_test
 
 from pathlib import Path
 FILE = Path(__file__).resolve()
@@ -64,5 +64,5 @@ PeMS = data_gen(pjoin(dataset_dir, data_file), (n_train, n_val, n_test), n, n_hi
 print(f'>> Loading dataset with Mean: {PeMS.mean:.2f}, STD: {PeMS.std:.2f}')
 
 if __name__ == '__main__':
-    model_train(PeMS, blocks, args)
+    # model_train(PeMS, blocks, args)
     model_test(PeMS, PeMS.get_len('test'), n_his, n_pred, args.inf_mode)

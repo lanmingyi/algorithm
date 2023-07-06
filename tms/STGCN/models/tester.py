@@ -1,5 +1,5 @@
-from data_loader.data_utils import gen_batch
-from utils.math_utils import evaluation
+from tms.STGCN.data_loader.data_utils import gen_batch
+from tms.STGCN.utils.math_utils import evaluation
 from os.path import join as pjoin
 
 import tensorflow.compat.v1 as tf

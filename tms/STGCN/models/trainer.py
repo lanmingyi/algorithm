@@ -1,6 +1,6 @@
-from data_loader.data_utils import gen_batch
-from models.tester import model_inference
-from models.base_model import build_model, model_save
+from tms.STGCN.data_loader.data_utils import gen_batch
+from tms.STGCN.models.tester import model_inference
+from tms.STGCN.models.base_model import build_model, model_save
 from os.path import join as pjoin
 
 import tensorflow.compat.v1 as tf
