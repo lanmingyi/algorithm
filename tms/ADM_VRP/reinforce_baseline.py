@@ -32,8 +32,9 @@ def copy_of_tf_model(model, embedding_dim=128, graph_size=20):
 
     return new_model
 
-def rollout(model, dataset, batch_size = 1000, disable_tqdm = False):
-    # Evaluate model in greedy mode
+
+def rollout(model, dataset, batch_size=1000, disable_tqdm=False):
+    # Evaluate model in greedy mode 在贪心模式下计算模型
     set_decode_type(model, "greedy")
     costs_list = []
 
@@ -101,7 +102,6 @@ class RolloutBaseline:
         # create and evaluate initial baseline
         self._update_baseline(model, epoch)
 
-
     def _update_baseline(self, model, epoch):
 
         # Load or copy baseline model based on self.from_checkpoint condition
@@ -128,6 +128,7 @@ class RolloutBaseline:
 
     def ema_eval(self, cost):
         """This is running average of cost through previous batches (only for warm-up epochs)
+            这是之前批次的运行平均成本(仅用于预热阶段)
         """
 
         if self.running_average_cost is None:
@@ -139,6 +140,7 @@ class RolloutBaseline:
 
     def eval(self, batch, cost):
         """Evaluates current baseline model on single training batch
+            在单个训练批次上评估当前的基线模型
         """
 
         if self.alpha == 0:
@@ -155,10 +157,12 @@ class RolloutBaseline:
         v_ema = tf.stop_gradient(v_ema)
 
         # Combination of baseline cost and exp. moving average cost
+        # 基线成本和经验的组合。移动平均成本
         return self.alpha * v_b + (1 - self.alpha) * v_ema
 
     def eval_all(self, dataset):
         """Evaluates current baseline model on the whole dataset only for non warm-up epochs
+            仅在非暖化时期评估整个数据集上的当前基线模型
         """
 
         if self.alpha < 1:
@@ -170,17 +174,19 @@ class RolloutBaseline:
 
     def epoch_callback(self, model, epoch):
         """Compares current baseline model with the training model and updates baseline if it is improved
+            将当前基线模型与训练模型进行比较，如果基线有所改进，则更新基线
         """
 
         self.cur_epoch = epoch
-
+        # Evaluating candidate model on baseline dataset
         print(f"Evaluating candidate model on baseline dataset (callback epoch = {self.cur_epoch})")
         candidate_vals = rollout(model, self.dataset)  # costs for training model on baseline dataset
         candidate_mean = tf.reduce_mean(candidate_vals)
 
         diff = candidate_mean - self.mean
 
-        print(f"Epoch {self.cur_epoch} candidate mean {candidate_mean}, baseline epoch {self.cur_epoch} mean {self.mean}, difference {diff}")
+        print(
+            f"Epoch {self.cur_epoch} candidate mean {candidate_mean}, baseline epoch {self.cur_epoch} mean {self.mean}, difference {diff}")
 
         if diff < 0:
             # statistic + p-value
@@ -193,14 +199,14 @@ class RolloutBaseline:
                 print('Update baseline')
                 self._update_baseline(model, self.cur_epoch)
 
-        # alpha controls the amount of warmup
+        # alpha controls the amount of warmup Alpha控制预热学习率的量
         if self.alpha < 1.0:
             self.alpha = (self.cur_epoch + 1) / float(self.wp_n_epochs)
             print(f"alpha was updated to {self.alpha}")
 
 
 def load_tf_model(path, embedding_dim=128, graph_size=20, n_encode_layers=2):
-    """Load model weights from hd5 file
+    """Load model weights from hd5 file 从hd5文件加载模型权重
     """
     # https://stackoverflow.com/questions/51806852/cant-save-custom-subclassed-model
     CAPACITIES = {10: 20.,
@@ -214,7 +220,7 @@ def load_tf_model(path, embedding_dim=128, graph_size=20, n_encode_layers=2):
                    tf.cast(tf.random.uniform(minval=1, maxval=10, shape=(2, graph_size),
                                              dtype=tf.int32), tf.float32) / tf.cast(CAPACITIES[graph_size], tf.float32)]
 
-    model_loaded = AttentionDynamicModel(embedding_dim,n_encode_layers=n_encode_layers)
+    model_loaded = AttentionDynamicModel(embedding_dim, n_encode_layers=n_encode_layers)
     set_decode_type(model_loaded, "greedy")
     _, _ = model_loaded(data_random)
 

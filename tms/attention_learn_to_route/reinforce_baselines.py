@@ -5,6 +5,7 @@ from scipy.stats import ttest_rel
 import copy
 from train import rollout, get_inner_model
 
+
 class Baseline(object):
 
     def wrap_dataset(self, dataset):

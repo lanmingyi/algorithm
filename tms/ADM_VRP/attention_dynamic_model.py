@@ -8,6 +8,7 @@ from enviroment import AgentVRP
 def set_decode_type(model, decode_type):
     model.set_decode_type(decode_type)
 
+
 class AttentionDynamicModel(tf.keras.Model):
 
     def __init__(self,
@@ -81,10 +82,10 @@ class AttentionDynamicModel(tf.keras.Model):
 
         # assert tf.reduce_all(logits == logits), "Probs should not contain any nans"
 
-        if self.decode_type == "greedy":
+        if self.decode_type == "greedy":  # 贪婪
             selected = tf.math.argmax(logits, axis=-1)  # (batch_size, 1)
 
-        elif self.decode_type == "sampling":
+        elif self.decode_type == "sampling":  # 采样
             # logits has a shape of (batch_size, 1, n_nodes), we have to squeeze it
             # to (batch_size, n_nodes) since tf.random.categorical requires matrix
             selected = tf.random.categorical(logits[:, 0, :], 1)  # (bach_size,1)
@@ -98,35 +99,39 @@ class AttentionDynamicModel(tf.keras.Model):
            Returns a part [h_N, D] of context vector [h_c, h_N, D],
            that is related to RL Agent last step.
         """
-        # index of previous node
+        # index of previous node 前一个节点的索引
         prev_node = state.prev_a  # (batch_size, 1)
 
         # from embeddings=(batch_size, n_nodes, input_dim) select embeddings of previous nodes
-        cur_embedded_node = tf.gather(embeddings, tf.cast(prev_node, tf.int32), batch_dims=1)  # (batch_size, 1, input_dim)
+        # 从embeddings=(batch size, n个节点，input dim)中选择之前节点的embeddings
+        cur_embedded_node = tf.gather(embeddings, tf.cast(prev_node, tf.int32),
+                                      batch_dims=1)  # (batch_size, 1, input_dim)
 
-        # add remaining capacity
-        step_context = tf.concat([cur_embedded_node, self.problem.VEHICLE_CAPACITY - state.used_capacity[:, :, None]], axis=-1)
+        # add remaining capacity 增加剩余容量
+        step_context = tf.concat([cur_embedded_node, self.problem.VEHICLE_CAPACITY - state.used_capacity[:, :, None]],
+                                 axis=-1)
 
         return step_context  # (batch_size, 1, input_dim + 1)
 
     def decoder_mha(self, Q, K, V, mask=None):
-        """ Computes Multi-Head Attention part of decoder
+        """ Computes Multi-Head Attention part of decoder 计算解码器的多头注意部分
         Basically, its a part of MHA sublayer, but we cant construct a layer since Q changes in a decoding loop.
+        基本上，它是MHA子层的一部分，但我们不能构建一个层，因为Q在解码循环中变化。
 
         Args:
             mask: a mask for visited nodes,
                 has shape (batch_size, seq_len_q, seq_len_k), seq_len_q = 1 for context vector attention in decoder
             Q: query (context vector for decoder)
                     has shape (..., seq_len_q, head_depth) with seq_len_q = 1 for context_vector attention in decoder
-            K, V: key, value (projections of nodes embeddings)
+            K, V: key, value (projections of nodes embeddings) 节点嵌入的投影
                 have shape (..., seq_len_k, head_depth), (..., seq_len_v, head_depth),
                                                                 with seq_len_k = seq_len_v = n_nodes for decoder
         """
 
-        compatibility = tf.matmul(Q, K, transpose_b=True)/tf.math.sqrt(self.dk_mha_decoder)  # (batch_size, num_heads, seq_len_q, seq_len_k)
+        compatibility = tf.matmul(Q, K, transpose_b=True) / tf.math.sqrt(
+            self.dk_mha_decoder)  # (batch_size, num_heads, seq_len_q, seq_len_k)
 
         if mask is not None:
-
             # we need to reshape mask:
             # (batch_size, seq_len_q, seq_len_k) --> (batch_size, 1, seq_len_q, seq_len_k)
             # so that we will be able to do a broadcast:
@@ -144,14 +149,13 @@ class AttentionDynamicModel(tf.keras.Model):
                                      compatibility
                                      )
 
-
         compatibility = tf.nn.softmax(compatibility, axis=-1)  # (batch_size, num_heads, seq_len_q, seq_len_k)
         attention = tf.matmul(compatibility, V)  # (batch_size, num_heads, seq_len_q, head_depth)
 
-        # transpose back to (batch_size, seq_len_q, num_heads, depth)
+        # transpose back to (batch_size, seq_len_q, num_heads, depth)  转置
         attention = tf.transpose(attention, perm=[0, 2, 1, 3])
 
-        # concatenate heads (last 2 dimensions)
+        # concatenate heads (last 2 dimensions) 连接头(最后2个维度)
         attention = tf.reshape(attention, (self.batch_size, -1, self.output_dim))  # (batch_size, seq_len_q, output_dim)
 
         output = self.w_out(attention)  # (batch_size, seq_len_q, output_dim), seq_len_q = 1 for context att in decoder
@@ -161,6 +165,7 @@ class AttentionDynamicModel(tf.keras.Model):
     def get_log_p(self, Q, K, mask=None):
         """Single-Head attention sublayer in decoder,
         computes log-probabilities for node selection.
+        解码器中的单头注意子层，计算节点选择的对数概率。
 
         Args:
             mask: mask for nodes
@@ -174,7 +179,6 @@ class AttentionDynamicModel(tf.keras.Model):
         compatibility = tf.math.tanh(compatibility) * self.tanh_clipping
 
         if mask is not None:
-
             # we dont need to reshape mask like we did in multi-head version:
             # (batch_size, seq_len_q, seq_len_k) --> (batch_size, num_heads, seq_len_q, seq_len_k)
             # since we dont have multiple heads
@@ -199,7 +203,7 @@ class AttentionDynamicModel(tf.keras.Model):
         log_p = tf.gather_nd(_log_p, tf.cast(tf.expand_dims(a, axis=-1), tf.int32), batch_dims=2)
 
         # Calculate log_likelihood
-        return tf.reduce_sum(log_p,1)
+        return tf.reduce_sum(log_p, 1)
 
     def get_projections(self, embeddings, context_vectors):
 
@@ -242,8 +246,8 @@ class AttentionDynamicModel(tf.keras.Model):
 
             inner_i = 0
             while not state.partial_finished():
-
-                step_context = self.get_step_context(state, embeddings)  # (batch_size, 1), (batch_size, 1, input_dim + 1)
+                step_context = self.get_step_context(state,
+                                                     embeddings)  # (batch_size, 1), (batch_size, 1, input_dim + 1)
                 Q_step_context = self.wq_step_context(step_context)  # (batch_size, 1, output_dim)
                 Q = Q_context + Q_step_context
 

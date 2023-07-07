@@ -169,4 +169,8 @@ def run(opts):
 
 
 if __name__ == "__main__":
-    run(get_options())
+    options = get_options()
+    options.graph_size = 20
+    options.baseline = 'rollout'
+    options.run_name = 'tsp20_rollout'
+    run(options)

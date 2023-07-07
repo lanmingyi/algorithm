@@ -7,8 +7,15 @@ import numpy as np
 from tqdm import tqdm
 
 from utils import read_from_pickle
+"""
+朴素的求解思想
+1.贪婪求解：从起点开始，下一个点为与当前点距离最短的点(不包括已选中的点)，依次类推，直至包含所有的点，再回到起点。缺点很显然。
 
-class BaselineLKH3():
+2.改进思路一：基于边交换的路径优化 LKH
+"""
+
+
+class BaselineLKH3:
     def __init__(self, cur_dir, dataset_path, executable_path):
         """
         Args:
@@ -31,7 +38,7 @@ class BaselineLKH3():
 
         self.problem_files = []
 
-        self.tour_files= []
+        self.tour_files = []
 
         self.params_files = []
 
@@ -59,8 +66,8 @@ class BaselineLKH3():
         for i in range(len_of_val_dataset):
 
             depot, loc, demands = self.val_data[0][i].numpy().tolist(), \
-                                  self.val_data[1][i].numpy().tolist(), \
-                                  self.val_data[2][i].numpy().tolist()
+                self.val_data[1][i].numpy().tolist(), \
+                self.val_data[2][i].numpy().tolist()
 
             # LKH-3 requires int as demands
             demands = [int(30.0 * x) for x in demands]
@@ -90,7 +97,7 @@ class BaselineLKH3():
 
             BaselineLKH3.write_lkh_par(params_file, params)
 
-            if i%1000 == 0:
+            if i % 1000 == 0:
                 print('Number of processed graphs: {}'.format(i))
 
         file_paths = list(zip(self.params_files,
@@ -114,8 +121,7 @@ class BaselineLKH3():
             path_tuples_for_lkh3 = zip(self.params_files, self.tour_files)
 
         for cur_params_file, cur_tour_file in tqdm(path_tuples_for_lkh3):
-
-            base=os.path.basename(cur_params_file)
+            base = os.path.basename(cur_params_file)
             log_filename = os.path.join(self.dir, "{}.lkh{}.log".format(os.path.splitext(base)[0], self.runs))
 
             # Run LKH-3 and write log into log_filename
@@ -193,8 +199,9 @@ class BaselineLKH3():
             f.write("\n")
             f.write("NODE_COORD_SECTION\n")
             f.write("\n".join([
-                "{}\t{}\t{}".format(i + 1, int(x / grid_size * 100000 + 0.5), int(y / grid_size * 100000 + 0.5))  # VRPlib does not take floats
-                #"{}\t{}\t{}".format(i + 1, x, y)
+                "{}\t{}\t{}".format(i + 1, int(x / grid_size * 100000 + 0.5), int(y / grid_size * 100000 + 0.5))
+                # VRPlib does not take floats
+                # "{}\t{}\t{}".format(i + 1, x, y)
                 for i, (x, y) in enumerate([depot] + loc)
             ]))
             f.write("\n")
@@ -219,7 +226,7 @@ class BaselineLKH3():
                               "RUNS": 10,
                               "TRACE_LEVEL": 1,
                               "SEED": 0
-                             }
+                              }
 
         with open(filename, 'w') as f:
             for k, v in {**default_parameters, **parameters}.items():

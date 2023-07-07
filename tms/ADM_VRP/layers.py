@@ -5,6 +5,7 @@ import numpy as np
 
 class MultiHeadAttention(tf.keras.layers.Layer):
     """ Attention Layer - multi-head scaled dot product attention (for encoder and decoder)
+        注意层-多头缩放点积注意(用于编码器和解码器)
 
         Args:
             num_heads: number of attention heads which will be computed in parallel
@@ -31,7 +32,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         if self.d_model % self.n_heads != 0:
             raise ValueError("number of heads must divide d_model")
 
-        # define weight matrices
+        # define weight matrices  定义权重矩阵
         self.wq = tf.keras.layers.Dense(self.d_model, use_bias=False)  # (d_q, d_model)
         self.wk = tf.keras.layers.Dense(self.d_model, use_bias=False)  # (d_k, d_model)
         self.wv = tf.keras.layers.Dense(self.d_model, use_bias=False)  # (d_v, d_model)
@@ -39,7 +40,7 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         self.w_out = tf.keras.layers.Dense(self.d_model, use_bias=False)  # (d_model, d_model)
 
     def split_heads(self, tensor, batch_size):
-        """Function for computing attention on several heads simultaneously
+        """Function for computing attention on several heads simultaneously 同时计算多个头部注意力的功能
         Splits last dimension of a tensor into (num_heads, head_depth).
         Then we transpose it as (batch_size, num_heads, ..., head_depth) so that we can use broadcast
         """
@@ -101,8 +102,9 @@ class MultiHeadAttention(tf.keras.layers.Layer):
         # concatenate heads (last 2 dimensions)
         attention = tf.reshape(attention, (batch_size, -1, self.d_model))  # (batch_size, seq_len_q, d_model)
 
-        # project output to the same dimension
+        # project output to the same dimension 项目输出到相同的维度
         # this is equiv. to sum in the article (project heads with W_o and sum), beacuse of block-matrix multiplication
+        # 这相当于文章中的sum(项目头部有W和sum)，因为是块矩阵乘法
         #e.g. https://math.stackexchange.com/questions/2961550/matrix-block-multiplication-definition-properties-and-applications
 
         output = self.w_out(attention)  # (batch_size, seq_len_q, d_model)
