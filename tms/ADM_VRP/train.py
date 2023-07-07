@@ -7,6 +7,15 @@ from reinforce_baseline import validate
 
 from utils import generate_data_onfly, get_results, get_cur_time
 from time import gmtime, strftime
+"""
+一个数学优化模型有5个部分：
+
+集合和索引（Sets and indices）
+参数（Parameters）
+决策变量（Decision variables）
+目标函数（Objective function(s)）
+约束条件（Constraints）
+"""
 
 
 def train_model(optimizer,
