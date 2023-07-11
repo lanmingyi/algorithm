@@ -28,21 +28,21 @@ def reward(sample_solution, USE_CUDA=False):
     batch_size = sample_solution[0].size(0)
     n = len(sample_solution)
     tour_len = Variable(torch.zeros([batch_size]))
-    
+
     if USE_CUDA:
         tour_len = tour_len.cuda()
 
-    for i in range(n-1):
-        tour_len += torch.norm(sample_solution[i] - sample_solution[i+1], dim=1)
-    
-    tour_len += torch.norm(sample_solution[n-1] - sample_solution[0], dim=1)
+    for i in range(n - 1):
+        tour_len += torch.norm(sample_solution[i] - sample_solution[i + 1], dim=1)
+
+    tour_len += torch.norm(sample_solution[n - 1] - sample_solution[0], dim=1)
 
     # For TSP_20 - map to a number between 0 and 1
     # min_len = 3.5
     # max_len = 10.
     # TODO: generalize this for any TSP size
-    #tour_len = -0.1538*tour_len + 1.538 
-    #tour_len[tour_len < 0.] = 0.
+    # tour_len = -0.1538*tour_len + 1.538
+    # tour_len[tour_len < 0.] = 0.
     return tour_len
 
 
@@ -61,20 +61,22 @@ GOOGLE_DRIVE_IDS = {
     'tsp50_test.txt.zip': '0B2fg8yPGn2TCUVlCQmQtelpZTTQ',
 }
 
+
 def download_file_from_google_drive(id, destination):
     URL = "https://docs.google.com/uc?export=download"
 
     session = requests.Session()
 
-    response = session.get(URL, params = { 'id' : id }, stream = True)
+    response = session.get(URL, params={'id': id}, stream=True)
     token = get_confirm_token(response)
 
     if token:
-        params = { 'id' : id, 'confirm' : token }
-        response = session.get(URL, params = params, stream = True)
+        params = {'id': id, 'confirm': token}
+        response = session.get(URL, params=params, stream=True)
 
-    save_response_content(response, destination)  
+    save_response_content(response, destination)
     return True
+
 
 def get_confirm_token(response):
     for key, value in response.cookies.items():
@@ -82,13 +84,15 @@ def get_confirm_token(response):
             return value
     return None
 
+
 def save_response_content(response, destination):
     CHUNK_SIZE = 32768
 
     with open(destination, "wb") as f:
         for chunk in tqdm(response.iter_content(CHUNK_SIZE)):
-            if chunk: # filter out keep-alive new chunks
-                 f.write(chunk)
+            if chunk:  # filter out keep-alive new chunks
+                f.write(chunk)
+
 
 def download_google_drive_file(data_dir, task, min_length, max_length):
     paths = {}
@@ -115,6 +119,7 @@ def download_google_drive_file(data_dir, task, min_length, max_length):
 
     return paths
 
+
 def read_paper_dataset(paths, max_length):
     x, y = [], []
     for path in paths:
@@ -124,9 +129,10 @@ def read_paper_dataset(paths, max_length):
             for l in tqdm(f):
                 inputs, outputs = l.split(' output ')
                 x.append(np.array(inputs.split(), dtype=np.float32).reshape([-1, 2]))
-                y.append(np.array(outputs.split(), dtype=np.int32)[:-1]) # skip the last one
+                y.append(np.array(outputs.split(), dtype=np.int32)[:-1])  # skip the last one
 
     return x, y
+
 
 def maybe_generate_and_save(self, except_list=[]):
     data = {}
@@ -141,10 +147,12 @@ def maybe_generate_and_save(self, except_list=[]):
         tmp = np.load(path)
         self.data[name] = TSP(x=tmp['x'], y=tmp['y'], name=name)
 
+
 def get_path(self, name):
     return os.path.join(
         self.data_dir, "{}_{}={}.npz".format(
             self.task_name, name, self.data_num[name]))
+
 
 def read_zip_and_update_data(self, path, name):
     if path.endswith('zip'):
@@ -159,8 +167,8 @@ def read_zip_and_update_data(self, path, name):
     y = np.zeros([len(y_list), self.max_length], dtype=np.int32)
 
     for idx, (nodes, res) in enumerate(tqdm(zip(x_list, y_list))):
-        x[idx,:len(nodes)] = nodes
-        y[idx,:len(res)] = res
+        x[idx, :len(nodes)] = nodes
+        y[idx, :len(res)] = res
 
     if self.data is None:
         self.data = {}
@@ -170,31 +178,30 @@ def read_zip_and_update_data(self, path, name):
 
 
 def create_dataset(
-    problem_size, 
-    data_dir):
-
+        problem_size,
+        data_dir):
     def find_or_return_empty(data_dir, problem_size):
-        #train_fname1 = os.path.join(data_dir, 'tsp{}.txt'.format(problem_size))
+        # train_fname1 = os.path.join(data_dir, 'tsp{}.txt'.format(problem_size))
         val_fname1 = os.path.join(data_dir, 'tsp{}_test.txt'.format(problem_size))
-        #train_fname2 = os.path.join(data_dir, 'tsp-{}.txt'.format(problem_size))
+        # train_fname2 = os.path.join(data_dir, 'tsp-{}.txt'.format(problem_size))
         val_fname2 = os.path.join(data_dir, 'tsp-{}_test.txt'.format(problem_size))
-        
+
         if not os.path.isdir(data_dir):
             os.mkdir(data_dir)
         else:
-    #         if os.path.exists(train_fname1) and os.path.exists(val_fname1):
-    #             return train_fname1, val_fname1
-    #         if os.path.exists(train_fname2) and os.path.exists(val_fname2):
-    #             return train_fname2, val_fname2
-    #     return None, None
+            #         if os.path.exists(train_fname1) and os.path.exists(val_fname1):
+            #             return train_fname1, val_fname1
+            #         if os.path.exists(train_fname2) and os.path.exists(val_fname2):
+            #             return train_fname2, val_fname2
+            #     return None, None
 
-    # train, val = find_or_return_empty(data_dir, problem_size)
-    # if train is None and val is None:
-    #     download_google_drive_file(data_dir,
-    #         'tsp', '', problem_size) 
-    #     train, val = find_or_return_empty(data_dir, problem_size)
+            # train, val = find_or_return_empty(data_dir, problem_size)
+            # if train is None and val is None:
+            #     download_google_drive_file(data_dir,
+            #         'tsp', '', problem_size)
+            #     train, val = find_or_return_empty(data_dir, problem_size)
 
-    # return train, val
+            # return train, val
             if os.path.exists(val_fname1):
                 return val_fname1
             if os.path.exists(val_fname2):
@@ -213,11 +220,11 @@ def create_dataset(
 # Dataset
 #######################################
 class TSPDataset(Dataset):
-    
+
     def __init__(self, dataset_fname=None, train=False, size=50, num_samples=1000000, random_seed=1111):
         super(TSPDataset, self).__init__()
-        #start = torch.FloatTensor([[-1], [-1]]) 
-        
+        # start = torch.FloatTensor([[-1], [-1]])
+
         torch.manual_seed(random_seed)
 
         self.data_set = []
@@ -227,13 +234,13 @@ class TSPDataset(Dataset):
                     inputs, outputs = l.split(' output ')
                     sample = torch.zeros(1, )
                     x = np.array(inputs.split(), dtype=np.float32).reshape([-1, 2]).T
-                    #y.append(np.array(outputs.split(), dtype=np.int32)[:-1]) # skip the last one
+                    # y.append(np.array(outputs.split(), dtype=np.int32)[:-1]) # skip the last one
                     self.data_set.append(x)
         else:
             # randomly sample points uniformly from [0, 1]
             for l in tqdm(range(num_samples)):
                 x = torch.FloatTensor(2, size).uniform_(0, 1)
-                #x = torch.cat([start, x], 1)
+                # x = torch.cat([start, x], 1)
                 self.data_set.append(x)
 
         self.size = len(self.data_set)
@@ -243,6 +250,7 @@ class TSPDataset(Dataset):
 
     def __getitem__(self, idx):
         return self.data_set[idx]
-    
+
+
 if __name__ == '__main__':
     paths = download_google_drive_file('data/tsp', 'tsp', '', '50')

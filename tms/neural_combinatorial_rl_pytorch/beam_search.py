@@ -13,7 +13,18 @@
 # Code borrowed from https://github.com/MaximumEntropy/Seq2Seq-PyTorch/blob/master/beam_search.py,
 # who borrowed it from PyTorch OpenNMT example
 # https://github.com/pytorch/examples/blob/master/OpenNMT/onmt/Beam.py
-# :-) 
+# :-)
+"""
+文本生成任务中常用的解码策略Beam Search（集束搜索）。
+beam search是对贪心策略一个改进。思路也很简单，就是稍微放宽一些考察的范围。
+在每一个时间步，不再只保留当前分数最高的1个输出，而是保留num_beams个。
+当num_beams=1时集束搜索就退化成了贪心搜索。
+
+贪心算法，又名贪婪法，是寻找最优解问题的常用方法，这种方法模式一般将求解过程分成若干个步骤，
+但每个步骤都应用贪心原则，选取当前状态下最好/最优的选择（局部最有利的选择），并以此希望最后堆叠出的结果也是最好/最优的解。
+{看着这个名字，贪心，贪婪这两字的内在含义最为关键。这就好像一个贪婪的人，他事事都想要眼前看到最好的那个，看不到长远的东西，也不为最终的结果和将来着想，贪图眼前局部的利益最大化，有点走一步看一步的感觉。}
+
+"""
 
 import torch
 
