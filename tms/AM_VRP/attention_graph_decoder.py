@@ -2,6 +2,7 @@ import tensorflow as tf
 from Enviroment import VRPproblem
 import numpy as np
 
+
 class GraphAttentionDecoder(tf.keras.layers.Layer):
 
     def __init__(self,
@@ -16,7 +17,7 @@ class GraphAttentionDecoder(tf.keras.layers.Layer):
         self.num_heads = num_heads
 
         self.head_depth = self.output_dim // self.num_heads
-        self.dk_mha_decoder = tf.cast(self.head_depth, tf.float32) #for decoding in mha_decoder
+        self.dk_mha_decoder = tf.cast(self.head_depth, tf.float32)  # for decoding in mha_decoder
         self.dk_get_loc_p = tf.cast(self.output_dim, tf.float32)  # for decoding in mha_decoder
 
         if self.output_dim % self.num_heads != 0:
@@ -26,8 +27,10 @@ class GraphAttentionDecoder(tf.keras.layers.Layer):
         self.decode_type = decode_type
 
         # we split projection matrix Wq into 2 matrices: Wq*[h_c, h_N, D] = Wq_context*h_c + Wq_step_context[h_N, D]
-        self.wq_context = tf.keras.layers.Dense(self.output_dim, use_bias=False, name='wq_context')  # (d_q_context, output_dim)
-        self.wq_step_context = tf.keras.layers.Dense(self.output_dim, use_bias=False, name='wq_step_context')  # (d_q_step_context, output_dim)
+        self.wq_context = tf.keras.layers.Dense(self.output_dim, use_bias=False,
+                                                name='wq_context')  # (d_q_context, output_dim)
+        self.wq_step_context = tf.keras.layers.Dense(self.output_dim, use_bias=False,
+                                                     name='wq_step_context')  # (d_q_step_context, output_dim)
 
         # we need two Wk projections since there is MHA followed by 1-head attention - they have different keys K
         self.wk = tf.keras.layers.Dense(self.output_dim, use_bias=False, name='wk')  # (d_k, output_dim)
@@ -56,21 +59,21 @@ class GraphAttentionDecoder(tf.keras.layers.Layer):
         """Select next node based on decoding type.
         """
 
-        #assert tf.reduce_all(logits == logits), "Probs should not contain any nans"
+        # assert tf.reduce_all(logits == logits), "Probs should not contain any nans"
 
         if self.decode_type == "greedy":
-            #probs = tf.exp(logits)
-            #selected = tf.math.argmax(probs, axis=-1) # (batch_size, 1)
-            selected = tf.math.argmax(logits, axis=-1) # (batch_size, 1)
+            # probs = tf.exp(logits)
+            # selected = tf.math.argmax(probs, axis=-1) # (batch_size, 1)
+            selected = tf.math.argmax(logits, axis=-1)  # (batch_size, 1)
 
         elif self.decode_type == "sampling":
             # logits has a shape of (batch_size, 1, n_nodes), we have to squeeze it
             # to (batch_size, n_nodes) since tf.random.categorical requires matrix
-            selected = tf.random.categorical(logits[:, 0, :], 1) #(bach_size,1)
+            selected = tf.random.categorical(logits[:, 0, :], 1)  # (bach_size,1)
         else:
             assert False, "Unknown decode type"
 
-        return tf.squeeze(selected, axis=-1) # (bach_size,)
+        return tf.squeeze(selected, axis=-1)  # (bach_size,)
 
     def get_step_context(self, state, embeddings):
         """Takes a state and graph embeddings,
@@ -81,10 +84,12 @@ class GraphAttentionDecoder(tf.keras.layers.Layer):
         prev_node = state.prev_a  # (batch_size, 1)
 
         # from embeddings=(batch_size, n_nodes, input_dim) select embeddings of previous nodes
-        cur_embedded_node = tf.gather(embeddings, tf.cast(prev_node, tf.int32), batch_dims=1)  # (batch_size, 1, input_dim)
+        cur_embedded_node = tf.gather(embeddings, tf.cast(prev_node, tf.int32),
+                                      batch_dims=1)  # (batch_size, 1, input_dim)
 
         # add remaining capacity
-        step_context = tf.concat([cur_embedded_node, self.problem.VEHICLE_CAPACITY - state.used_capacity[:, :, None]], axis=-1)
+        step_context = tf.concat([cur_embedded_node, self.problem.VEHICLE_CAPACITY - state.used_capacity[:, :, None]],
+                                 axis=-1)
 
         return step_context  # (batch_size, 1, input_dim + 1)
 
@@ -102,16 +107,16 @@ class GraphAttentionDecoder(tf.keras.layers.Layer):
                                                                 with seq_len_k = seq_len_v = n_nodes for decoder
         """
 
-        #batch_size = tf.shape(Q)[0]
+        # batch_size = tf.shape(Q)[0]
 
-        compatibility = tf.matmul(Q, K, transpose_b=True)/tf.math.sqrt(self.dk_mha_decoder)  # (batch_size, num_heads, seq_len_q, seq_len_k)
+        compatibility = tf.matmul(Q, K, transpose_b=True) / tf.math.sqrt(
+            self.dk_mha_decoder)  # (batch_size, num_heads, seq_len_q, seq_len_k)
 
-        #dk = tf.cast(tf.shape(K)[-1], tf.float32)
-        #compatibility = compatibility / tf.math.sqrt(dk)
-        #compatibility = compatibility / tf.math.sqrt(self.dk_mha_decoder)
+        # dk = tf.cast(tf.shape(K)[-1], tf.float32)
+        # compatibility = compatibility / tf.math.sqrt(dk)
+        # compatibility = compatibility / tf.math.sqrt(self.dk_mha_decoder)
 
         if mask is not None:
-
             # we need to reshape mask:
             # (batch_size, seq_len_q, seq_len_k) --> (batch_size, 1, seq_len_q, seq_len_k)
             # so that we will be able to do a broadcast:
@@ -151,14 +156,13 @@ class GraphAttentionDecoder(tf.keras.layers.Layer):
 
         compatibility = tf.matmul(Q, K, transpose_b=True) / tf.math.sqrt(self.dk_get_loc_p)
 
-        #dk = tf.cast(tf.shape(K)[-1], tf.float32)
-        #compatibility = compatibility / tf.math.sqrt(dk)
-        #compatibility = compatibility / tf.math.sqrt(self.dk_get_loc_p)
+        # dk = tf.cast(tf.shape(K)[-1], tf.float32)
+        # compatibility = compatibility / tf.math.sqrt(dk)
+        # compatibility = compatibility / tf.math.sqrt(self.dk_get_loc_p)
 
         compatibility = tf.math.tanh(compatibility) * self.tanh_clipping
 
         if mask is not None:
-
             # we dont need to reshape mask like we did in multi-head version:
             # (batch_size, seq_len_q, seq_len_k) --> (batch_size, num_heads, seq_len_q, seq_len_k)
             # since we dont have multiple heads
@@ -188,7 +192,6 @@ class GraphAttentionDecoder(tf.keras.layers.Layer):
         K_tanh = self.wk_tanh(self.embeddings)  # (batch_size, n_nodes, output_dim)
         V = self.wv(self.embeddings)  # (batch_size, n_nodes, output_dim)
         Q_context = self.wq_context(context_vectors[:, tf.newaxis, :])  # (batch_size, 1, output_dim)
-
 
         # we dont need to split K_tanh since there is only 1 head; Q will be split in decoding loop
         K = self.split_heads(K, self.batch_size)  # (batch_size, num_heads, n_nodes, head_depth)
@@ -226,6 +229,3 @@ class GraphAttentionDecoder(tf.keras.layers.Layer):
 
         # Collected lists, return Tensor
         return tf.stack(outputs, 1), tf.cast(tf.stack(sequences, 1), tf.float32)
-
-
-

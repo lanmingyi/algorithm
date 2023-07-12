@@ -32,7 +32,8 @@ def copy_of_tf_model(model, embedding_dim=128, graph_size=20):
 
     return new_model
 
-def rollout(model, dataset, batch_size = 1000, disable_tqdm = False):
+
+def rollout(model, dataset, batch_size=1000, disable_tqdm=False):
     # Evaluate model in greedy mode
     set_decode_type(model, "greedy")
     costs_list = []
@@ -99,7 +100,6 @@ class RolloutBaseline:
 
         # create and evaluate initial baseline
         self._update_baseline(model, epoch)
-
 
     def _update_baseline(self, model, epoch):
 
@@ -179,7 +179,8 @@ class RolloutBaseline:
 
         diff = candidate_mean - self.mean
 
-        print(f"Epoch {self.cur_epoch} candidate mean {candidate_mean}, baseline epoch {self.cur_epoch} mean {self.mean}, difference {diff}")
+        print(
+            f"Epoch {self.cur_epoch} candidate mean {candidate_mean}, baseline epoch {self.cur_epoch} mean {self.mean}, difference {diff}")
 
         if diff < 0:
             # statistic + p-value
@@ -213,7 +214,7 @@ def load_tf_model(path, embedding_dim=128, graph_size=20, n_encode_layers=2):
                    tf.cast(tf.random.uniform(minval=1, maxval=10, shape=(2, graph_size),
                                              dtype=tf.int32), tf.float32) / tf.cast(CAPACITIES[graph_size], tf.float32)]
 
-    model_loaded = AttentionModel(embedding_dim,n_encode_layers=n_encode_layers)
+    model_loaded = AttentionModel(embedding_dim, n_encode_layers=n_encode_layers)
     set_decode_type(model_loaded, "greedy")
     _, _ = model_loaded(data_random)
 

@@ -1,6 +1,7 @@
 import tensorflow as tf
 from layers import MultiHeadAttention
 
+
 class MultiHeadAttentionLayer(tf.keras.layers.Layer):
     """Feed-Forward Sublayer: fully-connected Feed-Forward network,
     built based on MHA vectors from MultiHeadAttention layer with skip-connections
@@ -40,6 +41,7 @@ class MultiHeadAttentionLayer(tf.keras.layers.Layer):
 
         return bn2_out
 
+
 class GraphAttentionEncoder(tf.keras.layers.Layer):
     """Graph Encoder, which uses MultiHeadAttentionLayer sublayer.
 
@@ -70,18 +72,19 @@ class GraphAttentionEncoder(tf.keras.layers.Layer):
         self.feed_forward_hidden = feed_forward_hidden
 
         # initial embeddings (batch_size, n_nodes-1, 2) --> (batch-size, input_dim), separate for depot and other nodes
-        self.init_embed_depot = tf.keras.layers.Dense(self.input_dim, name='init_embed_depot')  # nn.Linear(2, embedding_dim)
+        self.init_embed_depot = tf.keras.layers.Dense(self.input_dim,
+                                                      name='init_embed_depot')  # nn.Linear(2, embedding_dim)
         self.init_embed = tf.keras.layers.Dense(self.input_dim, name='init_embed')
 
         self.mha_layers = [MultiHeadAttentionLayer(self.input_dim, self.num_heads, self.feed_forward_hidden)
-                            for _ in range(self.num_layers)]
+                           for _ in range(self.num_layers)]
 
     def call(self, x, mask=None):
-
         assert mask is None, "TODO mask not yet supported!"
 
         x = tf.concat((self.init_embed_depot(x[0])[:, None, :],  # (batch_size, 2) --> (batch_size, 1, 2)
-                       self.init_embed(tf.concat((x[1], x[2][:, :, None]), axis=-1))  # (batch_size, n_nodes-1, 2) + (batch_size, n_nodes-1)
+                       self.init_embed(tf.concat((x[1], x[2][:, :, None]), axis=-1))
+                       # (batch_size, n_nodes-1, 2) + (batch_size, n_nodes-1)
                        ), axis=1)  # (batch_size, n_nodes, input_dim)
 
         # stack attention layers
@@ -89,4 +92,4 @@ class GraphAttentionEncoder(tf.keras.layers.Layer):
             x = self.mha_layers[i](x)
 
         output = (x, tf.reduce_mean(x, axis=1))
-        return output # (embeds of nodes, avg graph embed)=((batch_size, n_nodes, input), (batch_size, input_dim))
+        return output  # (embeds of nodes, avg graph embed)=((batch_size, n_nodes, input), (batch_size, input_dim))
