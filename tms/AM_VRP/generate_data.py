@@ -22,7 +22,8 @@ def create_data_on_disk(graph_size, num_samples, is_save=True, filename=None, is
     depo, graphs, demand = (tf.random.uniform(minval=0, maxval=1, shape=(num_samples, 2), seed=seed),
                             tf.random.uniform(minval=0, maxval=1, shape=(num_samples, graph_size, 2), seed=seed),
                             tf.cast(tf.random.uniform(minval=1, maxval=10, shape=(num_samples, graph_size),
-                                                      dtype=tf.int32, seed=seed), tf.float32) / tf.cast(CAPACITIES[graph_size], tf.float32)
+                                                      dtype=tf.int32, seed=seed), tf.float32) / tf.cast(
+                                CAPACITIES[graph_size], tf.float32)
                             )
     if is_save:
         save_to_pickle('Validation_dataset_{}.pkl'.format(filename), (depo, graphs, demand))
@@ -73,14 +74,14 @@ def generate_data_onfly(num_samples=10000, graph_size=20):
     depo, graphs, demand = (tf.random.uniform(minval=0, maxval=1, shape=(num_samples, 2)),
                             tf.random.uniform(minval=0, maxval=1, shape=(num_samples, graph_size, 2)),
                             tf.cast(tf.random.uniform(minval=1, maxval=10, shape=(num_samples, graph_size),
-                                                      dtype=tf.int32), tf.float32)/tf.cast(CAPACITIES[graph_size], tf.float32)
+                                                      dtype=tf.int32), tf.float32) / tf.cast(CAPACITIES[graph_size],
+                                                                                             tf.float32)
                             )
 
     return tf.data.Dataset.from_tensor_slices((list(depo), list(graphs), list(demand)))
 
 
 def get_results(train_loss_results, train_cost_results, val_cost, save_results=True, filename=None, plots=True):
-
     epochs_num = len(train_loss_results)
 
     df_train = pd.DataFrame(data={'epochs': list(range(epochs_num)),
@@ -216,4 +217,3 @@ def get_clean_path(arr):
         output.append(0.0)
 
     return output
-

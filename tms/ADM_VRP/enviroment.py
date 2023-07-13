@@ -92,9 +92,7 @@ class AgentVRP:
 
         # We can choose depot if 1) we are not in depot OR 2) all nodes are visited
         # 如果1)我们不在仓库，或者2)所有节点都被访问，我们可以选择仓库
-        # mask_depot = self.from_depot & (tf.reduce_sum(tf.cast(mask_loc == False, tf.int32), axis=-1) > 0)
-        mask_depot = self.from_depot & (tf.reduce_sum(tf.cast(mask_loc is False, tf.int32), axis=-1) > 0)
-
+        mask_depot = self.from_depot & (tf.reduce_sum(tf.cast(mask_loc == False, tf.int32), axis=-1) > 0)
         return tf.concat([mask_depot[:, :, None], mask_loc], axis=-1)
 
     def step(self, action):
